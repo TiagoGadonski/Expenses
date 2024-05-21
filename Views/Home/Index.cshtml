@@ -1,0 +1,71 @@
+﻿@model Expenses.ViewModel.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Current Expenses</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Value</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Current Installment</th>
+            <th>Total Installments</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var expense in Model.Expenses)
+    {
+        <tr>
+            <td>@expense.Description</td>
+            <td>@expense.Value</td>
+            <td>@expense.Date.ToShortDateString()</td>
+            <td>@expense.Category.Name</td>
+            <td>@expense.CurrentInstallment</td>
+            <td>@expense.Installments</td>
+            <td>
+                <form asp-action="MarkAsPaid" asp-controller="Expenses" method="post" style="display:inline;">
+                    <input type="hidden" name="id" value="@expense.Id" />
+                    <button type="submit" class="btn btn-success">Pago</button>
+                </form>
+                <a asp-action="Edit" asp-controller="Expenses" asp-route-id="@expense.Id" class="btn btn-warning">Edit</a>
+                <a asp-action="Details" asp-controller="Expenses" asp-route-id="@expense.Id" class="btn btn-info">Details</a>
+                <a asp-action="Delete" asp-controller="Expenses" asp-route-id="@expense.Id" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h1>Wishlist Items</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Category</th>
+            <th>Purchased</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.WishlistItems)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Price</td>
+            <td>@item.Category.Name</td>
+            <td>@item.IsPurchased</td>
+            <td>
+                <a asp-action="Edit" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                <a asp-action="Details" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                <a asp-action="Delete" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

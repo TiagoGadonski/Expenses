@@ -1,0 +1,61 @@
+﻿@model IEnumerable<Expenses.Models.Expense>
+
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+<h1>Expenses</h1>
+
+<form asp-action="Index" method="get">
+    <div class="form-group">
+        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Search by description">
+    </div>
+    <div class="form-group">
+        <select name="categoryId" class="form-control">
+            <option value="">All Categories</option>
+            @foreach (var category in ViewBag.Categories as IEnumerable<Expenses.Models.CategoryFinance>)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Value</th>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Current Installment</th>
+            <th>Total Installments</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Description</td>
+                <td>@item.Value</td>
+                <td>@item.Date.ToShortDateString()</td>
+                <td>@item.Category.Name</td>
+                <td>@item.CurrentInstallment</td>
+                <td>@item.Installments</td>
+                <td>
+                    <form asp-action="MarkAsPaid" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <button type="submit" class="btn btn-success">Pago</button>
+                    </form>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Create New</a>
