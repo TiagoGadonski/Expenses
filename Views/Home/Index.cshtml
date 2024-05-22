@@ -1,10 +1,49 @@
-﻿@model Expenses.ViewModel.HomeViewModel
+﻿@model Expenses.ViewModels.HomeViewModel
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<h1>Current Expenses</h1>
+<h1>Expenses</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+            <div class="card-header">Total Expenses</div>
+            <div class="card-body">
+                <h5 class="card-title">Total Value</h5>
+                <p class="card-text">@Model.TotalExpenses.ToString("C")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var goal in Model.GoalProgress)
+    {
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">@goal.Category</div>
+                <div class="card-body">
+                    <h5 class="card-title">Target: @goal.TargetAmount.ToString("C")</h5>
+                    <p class="card-text">Spent: @goal.TotalSpent.ToString("C")</p>
+                    <p class="card-text">Difference: @goal.Difference.ToString("C")</p>
+                    @if (goal.Difference < 0)
+                    {
+                        <p class="text-danger">You are over budget!</p>
+                    }
+                    else
+                    {
+                        <p class="text-success">You are within budget.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<h1>Expenses</h1>
+
 <table class="table">
     <thead>
         <tr>
@@ -18,54 +57,66 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (var expense in Model.Expenses)
-    {
-        <tr>
-            <td>@expense.Description</td>
-            <td>@expense.Value</td>
-            <td>@expense.Date.ToShortDateString()</td>
-            <td>@expense.Category.Name</td>
-            <td>@expense.CurrentInstallment</td>
-            <td>@expense.Installments</td>
-            <td>
-                <form asp-action="MarkAsPaid" asp-controller="Expenses" method="post" style="display:inline;">
-                    <input type="hidden" name="id" value="@expense.Id" />
-                    <button type="submit" class="btn btn-success">Pago</button>
-                </form>
-                <a asp-action="Edit" asp-controller="Expenses" asp-route-id="@expense.Id" class="btn btn-warning">Edit</a>
-                <a asp-action="Details" asp-controller="Expenses" asp-route-id="@expense.Id" class="btn btn-info">Details</a>
-                <a asp-action="Delete" asp-controller="Expenses" asp-route-id="@expense.Id" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model.Expenses)
+        {
+            <tr>
+                <td>@item.Description</td>
+                <td>@item.Value.ToString("C")</td>
+                <td>@item.Date.ToShortDateString()</td>
+                <td>@item.Category</td>
+                <td>@item.CurrentInstallment</td>
+                <td>@item.Installments</td>
+                <td>
+                    @if (!item.IsPaidThisMonth)
+                    {
+                        <form asp-action="MarkAsPaid" asp-controller="Expenses" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-success">Pago</button>
+                        </form>
+                    }
+                    <a asp-action="Edit" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Details" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Delete" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
 <h1>Wishlist Items</h1>
+
 <table class="table">
     <thead>
         <tr>
             <th>Name</th>
             <th>Price</th>
             <th>Category</th>
-            <th>Purchased</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.WishlistItems)
-    {
-        <tr>
-            <td>@item.Name</td>
-            <td>@item.Price</td>
-            <td>@item.Category.Name</td>
-            <td>@item.IsPurchased</td>
-            <td>
-                <a asp-action="Edit" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                <a asp-action="Details" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                <a asp-action="Delete" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model.WishlistItems)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Price?.ToString("C")</td>
+                <td>@item.Category</td>
+                <td>
+                    @if (!item.IsPurchased)
+                    {
+                        <form asp-action="MarkAsPurchased" asp-controller="WishlistItems" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-success">Purchased</button>
+                        </form>
+                    }
+                    <a asp-action="Edit" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Details" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Delete" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<a asp-action="Create" asp-controller="Expenses" class="btn btn-primary">Create New Expense</a>
+<a asp-action="Create" asp-controller="WishlistItems" class="btn btn-primary">Create New Wishlist Item</a>

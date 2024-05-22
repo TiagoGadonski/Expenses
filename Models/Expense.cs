@@ -19,13 +19,25 @@ namespace Expenses.Models
         [Required]
         public DateTime Date { get; set; }
 
-        [ForeignKey("CategoryFinance")]
-        public int CategoryId { get; set; }
-        public CategoryFinance Category { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Category { get; set; }
 
         public int? Installments { get; set; }
         public int? CurrentInstallment { get; set; }
         public bool IsPaidThisMonth { get; set; }
         public DateTime? LastPaymentDate { get; set; }
+
+        [NotMapped]
+        public bool IsPaidForCurrentMonth
+        {
+            get
+            {
+                return LastPaymentDate.HasValue &&
+                       LastPaymentDate.Value.Month == DateTime.Now.Month &&
+                       LastPaymentDate.Value.Year == DateTime.Now.Year;
+            }
+        }
     }
+
 }

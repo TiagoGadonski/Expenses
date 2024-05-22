@@ -11,11 +11,11 @@
         <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Search by description">
     </div>
     <div class="form-group">
-        <select name="categoryId" class="form-control">
+        <select name="category" class="form-control">
             <option value="">All Categories</option>
-            @foreach (var category in ViewBag.Categories as IEnumerable<Expenses.Models.CategoryFinance>)
+            @foreach (var category in ViewBag.Categories)
             {
-                <option value="@category.Id">@category.Name</option>
+                <!option value="@category" @(ViewData["CurrentCategory"] != null && ViewData["CurrentCategory"].ToString() == category.ToString() ? "selected" : "")>@category</!option>
             }
         </select>
     </div>
@@ -41,14 +41,17 @@
                 <td>@item.Description</td>
                 <td>@item.Value</td>
                 <td>@item.Date.ToShortDateString()</td>
-                <td>@item.Category.Name</td>
+                <td>@item.Category</td>
                 <td>@item.CurrentInstallment</td>
                 <td>@item.Installments</td>
                 <td>
-                    <form asp-action="MarkAsPaid" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="@item.Id" />
-                        <button type="submit" class="btn btn-success">Pago</button>
-                    </form>
+                    @if (!item.IsPaidForCurrentMonth)
+                    {
+                        <form asp-action="MarkAsPaid" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-success">Pago</button>
+                        </form>
+                    }
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
                     <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>

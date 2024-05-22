@@ -11,32 +11,32 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            Name
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Model.Name
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
+            Price
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)
+            @Model.Price
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Category.Name)
+            Category
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Category.Name)
+            @Model.Category
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.IsPurchased)
+            Is Purchased
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.IsPurchased)
+            @Model.IsPurchased
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-primary">Back to List</a>
 </div>

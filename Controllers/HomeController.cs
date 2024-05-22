@@ -1,6 +1,5 @@
 using Expenses.Data;
-using Expenses.Models;
-using Expenses.ViewModel;
+using Expenses.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,23 +16,37 @@ namespace Expenses.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var currentMonth = DateTime.Now.Month;
-            var currentYear = DateTime.Now.Year;
+            var expenses = await _context.Expenses.ToListAsync();
+            var totalExpenses = expenses.Sum(e => e.Value);
 
-            var expenses = await _context.Expenses
-                .Include(e => e.Category)
-                .Where(e => (e.LastPaymentDate == null || e.LastPaymentDate.Value.Month != currentMonth || e.LastPaymentDate.Value.Year != currentYear) || (e.Installments != null && e.CurrentInstallment < e.Installments))
-                .ToListAsync();
+            var goals = await _context.ExpenseGoals.ToListAsync();
+            var expensesByCategory = expenses
+                .GroupBy(e => e.Category)
+                .Select(g => new
+                {
+                    Category = g.Key,
+                    TotalSpent = g.Sum(e => e.Value)
+                }).ToList();
 
-            var wishlistItems = await _context.WishlistItems.Include(w => w.Category).ToListAsync();
-
-            var viewModel = new HomeViewModel
+            var goalProgress = goals.Select(g => new GoalProgressViewModel
             {
-                Expenses = expenses ?? new List<Expense>(),
-                WishlistItems = wishlistItems ?? new List<WishlistItem>()
+                Category = g.Category,
+                TargetAmount = g.TargetAmount,
+                TotalSpent = expensesByCategory
+                    .FirstOrDefault(e => e.Category == g.Category)?.TotalSpent ?? 0,
+                Difference = g.TargetAmount - (expensesByCategory
+                    .FirstOrDefault(e => e.Category == g.Category)?.TotalSpent ?? 0)
+            }).ToList();
+
+            var model = new HomeViewModel
+            {
+                Expenses = expenses,
+                WishlistItems = await _context.WishlistItems.ToListAsync(),
+                TotalExpenses = totalExpenses,
+                GoalProgress = goalProgress
             };
 
-            return View(viewModel);
+            return View(model);
         }
     }
 }

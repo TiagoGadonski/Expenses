@@ -5,23 +5,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Expenses.Controllers
 {
-    public class WishlistItemsController : Controller
+    public class ExpenseGoalsController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public WishlistItemsController(ApplicationDbContext context)
+        public ExpenseGoalsController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: WishlistItems
+        // GET: ExpenseGoals
         public async Task<IActionResult> Index()
         {
-            var wishlistItems = await _context.WishlistItems.ToListAsync();
-            return View(wishlistItems);
+            return View(await _context.ExpenseGoals.ToListAsync());
         }
 
-        // GET: WishlistItems/Details/5
+        // GET: ExpenseGoals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -29,37 +28,37 @@ namespace Expenses.Controllers
                 return NotFound();
             }
 
-            var wishlistItem = await _context.WishlistItems
+            var expenseGoal = await _context.ExpenseGoals
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (wishlistItem == null)
+            if (expenseGoal == null)
             {
                 return NotFound();
             }
 
-            return View(wishlistItem);
+            return View(expenseGoal);
         }
 
-        // GET: WishlistItems/Create
+        // GET: ExpenseGoals/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: WishlistItems/Create
+        // POST: ExpenseGoals/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,Category,IsPurchased")] WishlistItem wishlistItem)
+        public async Task<IActionResult> Create([Bind("Id,Category,TargetAmount")] ExpenseGoal expenseGoal)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(wishlistItem);
+                _context.Add(expenseGoal);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(wishlistItem);
+            return View(expenseGoal);
         }
 
-        // GET: WishlistItems/Edit/5
+        // GET: ExpenseGoals/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -67,20 +66,20 @@ namespace Expenses.Controllers
                 return NotFound();
             }
 
-            var wishlistItem = await _context.WishlistItems.FindAsync(id);
-            if (wishlistItem == null)
+            var expenseGoal = await _context.ExpenseGoals.FindAsync(id);
+            if (expenseGoal == null)
             {
                 return NotFound();
             }
-            return View(wishlistItem);
+            return View(expenseGoal);
         }
 
-        // POST: WishlistItems/Edit/5
+        // POST: ExpenseGoals/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Category,IsPurchased")] WishlistItem wishlistItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Category,TargetAmount")] ExpenseGoal expenseGoal)
         {
-            if (id != wishlistItem.Id)
+            if (id != expenseGoal.Id)
             {
                 return NotFound();
             }
@@ -89,12 +88,12 @@ namespace Expenses.Controllers
             {
                 try
                 {
-                    _context.Update(wishlistItem);
+                    _context.Update(expenseGoal);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!WishlistItemExists(wishlistItem.Id))
+                    if (!ExpenseGoalExists(expenseGoal.Id))
                     {
                         return NotFound();
                     }
@@ -105,10 +104,10 @@ namespace Expenses.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(wishlistItem);
+            return View(expenseGoal);
         }
 
-        // GET: WishlistItems/Delete/5
+        // GET: ExpenseGoals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -116,45 +115,30 @@ namespace Expenses.Controllers
                 return NotFound();
             }
 
-            var wishlistItem = await _context.WishlistItems
+            var expenseGoal = await _context.ExpenseGoals
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (wishlistItem == null)
+            if (expenseGoal == null)
             {
                 return NotFound();
             }
 
-            return View(wishlistItem);
+            return View(expenseGoal);
         }
 
-        // POST: WishlistItems/Delete/5
+        // POST: ExpenseGoals/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var wishlistItem = await _context.WishlistItems.FindAsync(id);
-            _context.WishlistItems.Remove(wishlistItem);
+            var expenseGoal = await _context.ExpenseGoals.FindAsync(id);
+            _context.ExpenseGoals.Remove(expenseGoal);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool WishlistItemExists(int id)
+        private bool ExpenseGoalExists(int id)
         {
-            return _context.WishlistItems.Any(e => e.Id == id);
-        }
-
-        // POST: WishlistItems/MarkAsPurchased/5
-        [HttpPost]
-        public async Task<IActionResult> MarkAsPurchased(int id)
-        {
-            var wishlistItem = await _context.WishlistItems.FindAsync(id);
-            if (wishlistItem == null)
-            {
-                return NotFound();
-            }
-
-            wishlistItem.IsPurchased = true;
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return _context.ExpenseGoals.Any(e => e.Id == id);
         }
     }
 }

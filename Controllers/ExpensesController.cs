@@ -1,8 +1,8 @@
 ﻿using Expenses.Data;
 using Expenses.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Expenses.Controllers
 {
@@ -16,9 +16,9 @@ namespace Expenses.Controllers
         }
 
         // GET: Expenses
-        public async Task<IActionResult> Index(string searchString, int? categoryId)
+        public async Task<IActionResult> Index(string searchString, string category)
         {
-            var expenses = from e in _context.Expenses.Include(e => e.Category)
+            var expenses = from e in _context.Expenses
                            select e;
 
             if (!string.IsNullOrEmpty(searchString))
@@ -26,12 +26,15 @@ namespace Expenses.Controllers
                 expenses = expenses.Where(e => e.Description.Contains(searchString));
             }
 
-            if (categoryId.HasValue)
+            if (!string.IsNullOrEmpty(category))
             {
-                expenses = expenses.Where(e => e.CategoryId == categoryId.Value);
+                expenses = expenses.Where(e => e.Category == category);
             }
 
-            ViewBag.Categories = new SelectList(await _context.CategoryFinances.ToListAsync(), "Id", "Name");
+            ViewBag.Categories = await _context.Expenses
+                                                .Select(e => e.Category)
+                                                .Distinct()
+                                                .ToListAsync();
             ViewData["CurrentFilter"] = searchString;
 
             return View(await expenses.ToListAsync());
@@ -46,7 +49,6 @@ namespace Expenses.Controllers
             }
 
             var expense = await _context.Expenses
-                .Include(e => e.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (expense == null)
             {
@@ -59,22 +61,39 @@ namespace Expenses.Controllers
         // GET: Expenses/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.CategoryFinances, "Id", "Name");
+            ViewBag.Categories = new List<string> { "Food", "Transport", "Utilities", "Entertainment", "Others" };
             return View();
         }
 
         // POST: Expenses/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,Value,Date,Installments,CurrentInstallment,IsPaidThisMonth,LastPaymentDate,CategoryId")] Expense expense)
+        public async Task<IActionResult> Create([Bind("Id,Description,Value,Date,Category,Installments,CurrentInstallment,IsPaidThisMonth,LastPaymentDate")] Expense expense)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(expense);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(expense);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error occurred while creating expense: {ex.Message}");
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the expense.");
+                }
             }
-            ViewData["CategoryId"] = new SelectList(_context.CategoryFinances, "Id", "Name", expense.CategoryId);
+            else
+            {
+                // Log the errors
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Debug.WriteLine($"ModelState Error: {error.ErrorMessage}");
+                }
+            }
+
+            ViewBag.Categories = new List<string> { "Food", "Transport", "Utilities", "Entertainment", "Others" };
             return View(expense);
         }
 
@@ -91,14 +110,14 @@ namespace Expenses.Controllers
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.CategoryFinances, "Id", "Name", expense.CategoryId);
+            ViewBag.Categories = new List<string> { "Food", "Transport", "Utilities", "Entertainment", "Others" };
             return View(expense);
         }
 
         // POST: Expenses/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Description,Value,Date,Installments,CurrentInstallment,IsPaidThisMonth,LastPaymentDate,CategoryId")] Expense expense)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Description,Value,Date,Category,Installments,CurrentInstallment,IsPaidThisMonth,LastPaymentDate")] Expense expense)
         {
             if (id != expense.Id)
             {
@@ -125,7 +144,7 @@ namespace Expenses.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.CategoryFinances, "Id", "Name", expense.CategoryId);
+            ViewBag.Categories = new List<string> { "Food", "Transport", "Utilities", "Entertainment", "Others" };
             return View(expense);
         }
 
@@ -138,7 +157,6 @@ namespace Expenses.Controllers
             }
 
             var expense = await _context.Expenses
-                .Include(e => e.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (expense == null)
             {
@@ -191,7 +209,7 @@ namespace Expenses.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index), "Home");
+            return RedirectToAction(nameof(Index));
         }
     }
 }
