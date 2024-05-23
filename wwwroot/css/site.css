@@ -1,5 +1,128 @@
+:root {
+    --primary: #6a0dad;
+    --secondary: #4b0082;
+    --success: #32cd32;
+    --info: #8a2be2;
+    --warning: #ff8c00;
+    --danger: #ff4500;
+    --light: #dcdcdc;
+    --dark: #2f4f4f;
+    --card-bg: rgba(255, 255, 255, 0.8); /* Light background with transparency */
+    --card-text: #000000; /* Dark text color for contrast */
+}
+
+/* Customizing Bootstrap classes */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.btn-success {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+
+.btn-info {
+    background-color: var(--info);
+    border-color: var(--info);
+}
+
+.btn-warning {
+    background-color: var(--warning);
+    border-color: var(--warning);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.bg-secondary {
+    background-color: var(--secondary) !important;
+}
+
+.bg-success {
+    background-color: var(--success) !important;
+}
+
+.bg-info {
+    background-color: var(--info) !important;
+}
+
+.bg-warning {
+    background-color: var(--warning) !important;
+}
+
+.bg-danger {
+    background-color: var(--danger) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.text-secondary {
+    color: var(--secondary) !important;
+}
+
+.text-success {
+    color: var(--success) !important;
+}
+
+.text-info {
+    color: var(--info) !important;
+}
+
+.text-warning {
+    color: var(--warning) !important;
+}
+
+.text-danger {
+    color: var(--danger) !important;
+}
+
+/* Background for the body */
+body {
+    background: linear-gradient(180deg, rgba(106, 13, 173, 0.3), rgba(47, 79, 79, 0.3)), url('/images/background.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #ffffff; /* Adjust text color for readability */
+}
+
+.card-custom {
+    background-color: var(--card-bg);
+    color: var(--card-text);
+}
+
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem; /* Adjust the width and height as needed */
+    height: 1.5rem; /* Adjust the width and height as needed */
+    padding: 0;
+    font-size: 1rem; /* Adjust the font size as needed */
+}
+
+.material-symbols-outlined {
+    font-size: .5rem; /* Adjust the font size as needed */
+    line-height: 1;
+}
+
 html {
-  font-size: 14px;
+    font-size: 14px;
+    font-family: "Montserrat", sans-serif !important;
+    font-optical-sizing: auto;
+    font-style: normal;
 }
 
 @media (min-width: 768px) {
@@ -18,5 +141,6 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    font-family: "Montserrat", sans-serif !important;
 }
