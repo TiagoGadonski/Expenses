@@ -1,27 +1,31 @@
-﻿using Expenses.Data;
-using Expenses.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Expenses.Data;
+using Expenses.Models;
 
 namespace Expenses.Controllers
 {
-    public class WishlistItemsController : Controller
+    public class IncomesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public WishlistItemsController(ApplicationDbContext context)
+        public IncomesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: WishlistItems
+        // GET: Incomes
         public async Task<IActionResult> Index()
         {
-            var wishlistItems = await _context.WishlistItems.ToListAsync();
-            return View(wishlistItems);
+            return View(await _context.Incomes.ToListAsync());
         }
 
-        // GET: WishlistItems/Details/5
+        // GET: Incomes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -29,37 +33,39 @@ namespace Expenses.Controllers
                 return NotFound();
             }
 
-            var wishlistItem = await _context.WishlistItems
+            var income = await _context.Incomes
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (wishlistItem == null)
+            if (income == null)
             {
                 return NotFound();
             }
 
-            return View(wishlistItem);
+            return View(income);
         }
 
-        // GET: WishlistItems/Create
+        // GET: Incomes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: WishlistItems/Create
+        // POST: Incomes/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,Category,Description,IsPurchased")] WishlistItem wishlistItem)
+        public async Task<IActionResult> Create([Bind("Id,Source,Amount,DateReceived,Description")] Income income)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(wishlistItem);
+                _context.Add(income);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(wishlistItem);
+            return View(income);
         }
 
-        // GET: WishlistItems/Edit/5
+        // GET: Incomes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -67,20 +73,22 @@ namespace Expenses.Controllers
                 return NotFound();
             }
 
-            var wishlistItem = await _context.WishlistItems.FindAsync(id);
-            if (wishlistItem == null)
+            var income = await _context.Incomes.FindAsync(id);
+            if (income == null)
             {
                 return NotFound();
             }
-            return View(wishlistItem);
+            return View(income);
         }
 
-        // POST: WishlistItems/Edit/5
+        // POST: Incomes/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Category,Description,IsPurchased")] WishlistItem wishlistItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Source,Amount,DateReceived,Description")] Income income)
         {
-            if (id != wishlistItem.Id)
+            if (id != income.Id)
             {
                 return NotFound();
             }
@@ -89,12 +97,12 @@ namespace Expenses.Controllers
             {
                 try
                 {
-                    _context.Update(wishlistItem);
+                    _context.Update(income);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!WishlistItemExists(wishlistItem.Id))
+                    if (!IncomeExists(income.Id))
                     {
                         return NotFound();
                     }
@@ -105,10 +113,10 @@ namespace Expenses.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(wishlistItem);
+            return View(income);
         }
 
-        // GET: WishlistItems/Delete/5
+        // GET: Incomes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -116,45 +124,34 @@ namespace Expenses.Controllers
                 return NotFound();
             }
 
-            var wishlistItem = await _context.WishlistItems
+            var income = await _context.Incomes
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (wishlistItem == null)
+            if (income == null)
             {
                 return NotFound();
             }
 
-            return View(wishlistItem);
+            return View(income);
         }
 
-        // POST: WishlistItems/Delete/5
+        // POST: Incomes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var wishlistItem = await _context.WishlistItems.FindAsync(id);
-            _context.WishlistItems.Remove(wishlistItem);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool WishlistItemExists(int id)
-        {
-            return _context.WishlistItems.Any(e => e.Id == id);
-        }
-
-        // POST: WishlistItems/MarkAsPurchased/5
-        [HttpPost]
-        public async Task<IActionResult> MarkAsPurchased(int id)
-        {
-            var wishlistItem = await _context.WishlistItems.FindAsync(id);
-            if (wishlistItem == null)
+            var income = await _context.Incomes.FindAsync(id);
+            if (income != null)
             {
-                return NotFound();
+                _context.Incomes.Remove(income);
             }
 
-            wishlistItem.IsPurchased = true;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        private bool IncomeExists(int id)
+        {
+            return _context.Incomes.Any(e => e.Id == id);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Expenses.Data
         public DbSet<WishlistItem> WishlistItems { get; set; }
         public DbSet<CategoryWishlist> CategoryWishlists { get; set; }
         public DbSet<ExpenseGoal> ExpenseGoals { get; set; }
+        public DbSet<Income> Incomes { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
