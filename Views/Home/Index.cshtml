@@ -3,8 +3,26 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-<div class="gap-3">
-    <div class="col gap-2">
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Bootstrap</strong>
+            <small>11 mins ago</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Hello, world! This is a toast message.
+            <div class="mt-2 pt-2 border-top">
+                <button type="button" class="btn btn-primary btn-sm">Take action</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="toast">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="gap-2">
+    <div class="d-flex gap-2 mb-3">
         <div class="col-md-4">
             <div class="card text-white bg-success p-3 fs-4 text-center">
                 <p class="card-title">Total Expenses: </p>
@@ -13,34 +31,65 @@
             </div>
         </div>
         <div>
-            <a asp-action="Create" asp-controller="Expenses" class="btn btn-primary">Create New Expense</a>
-            <a asp-action="Create" asp-controller="WishlistItems" class="btn btn-primary">Create New Wishlist Item</a>
-        </div>
-    </div>
-    <div class="row">
+            <div class="d-flex flex-column gap-2">
+                <a asp-action="Create" asp-controller="Expenses" class="btn btn-sm btn-primary d-flex align-items-center">
+                    <span class="material-symbols-outlined me-1">
+                        add
+                    </span>
+                    Expense
+                </a>
+                <a asp-action="Create" asp-controller="WishlistItems" class="btn btn-sm btn-primary d-flex align-items-center">
+                    <span class="material-symbols-outlined me-1">
+                        add
+                    </span>
+                    Wishlist Item
+                </a>
 
-        @foreach (var goal in Model.GoalProgress)
-        {
-            <div class="col-md-4">
-                <div class="card card-custom mb-3">
-                    <div class="card-header">@goal.Category</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Target: @goal.TargetAmount.ToString("C")</h5>
-                        <p class="card-text">Spent: @goal.TotalSpent.ToString("C")</p>
-                        <p class="card-text">Difference: @goal.Difference.ToString("C")</p>
-                        @if (goal.Difference < 0)
-                        {
-                            <p class="text-danger">You are over budget!</p>
-                        }
-                        else
-                        {
-                            <p class="text-success">You are within budget.</p>
-                        }
-                    </div>
+            </div>
+
+        </div>
+
+        <div>
+            <p class="d-inline-flex gap-1">
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    Acompanhe as metas
+                </button>
+            </p>
+            <div class="collapse" id="collapseExample">
+                <div class="row">
+
+                    @foreach (var goal in Model.GoalProgress)
+                    {
+                        <div class="col">
+                            <div class="card card-custom mb-3">
+                                <div class="card-header">@goal.Category</div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Target: @goal.TargetAmount.ToString("C")</h5>
+                                    <p class="card-text">Spent: @goal.TotalSpent.ToString("C")</p>
+                                    <p class="card-text">Difference: @goal.Difference.ToString("C")</p>
+                                    @if (goal.Difference < 0)
+                                    {
+                                        <p class="text-danger">You are over budget!</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-success">You are within budget.</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
-        }
+        </div>
     </div>
+
+
+   
+
+
+
+    
 
 
 

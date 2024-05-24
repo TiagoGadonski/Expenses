@@ -118,6 +118,10 @@ body {
     line-height: 1;
 }
 
+.toast-container {
+    z-index: 1055;
+}
+
 html {
     font-size: 14px;
     font-family: "Montserrat", sans-serif !important;
