@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Crypto Dashboard";
+    var btcTicker = ViewBag.BtcTicker?.Ticker;
+    var ltcTicker = ViewBag.LtcTicker?.Ticker;
+    var ethTicker = ViewBag.EthTicker?.Ticker;
+    var xmrTicker = ViewBag.XmrTicker?.Ticker;
+    var accountInfo = ViewBag.AccountInfo;
+}
+
+<div class="container-fluid p-0">
+    <div class="row mb-2 mb-xl-3">
+        <div class="col-auto d-none d-sm-block">
+            <h3><strong>Crypto</strong> Dashboard</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-6 col-xxl d-flex">
+            <div class="card flex-fill">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">BTC/USD</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat" style="background: #F7931A; color: white;">
+                                <i class="fa-solid fa-bitcoin-sign align-middle"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="mt-0 mb-1">$@btcTicker?.Last</h4>
+                    <div class="mb-0">
+                        <span class="text-muted">High: $@btcTicker?.High</span><br />
+                        <span class="text-muted">Low: $@btcTicker?.Low</span><br />
+                        <span class="text-muted">Volume: @btcTicker?.Vol BTC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Outros cards de criptomoedas -->
+
+        <div class="col-12 col-md-6 col-xxl d-flex">
+            <div class="card flex-fill">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">Account Info</h5>
+                        </div>
+                    </div>
+                    <h4 class="mt-0 mb-1">Balance: $@accountInfo?.Balance</h4>
+                    <div class="mb-0">
+                        <span class="text-muted">BTC: @accountInfo?.BtcBalance</span><br />
+                        <span class="text-muted">ETH: @accountInfo?.EthBalance</span><br />
+                        <span class="text-muted">LTC: @accountInfo?.LtcBalance</span><br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
