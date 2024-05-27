@@ -34,9 +34,9 @@
                     </div>
                     <h4 class="mt-0 mb-1">$@(btcTicker?.Last.ToString("0.00") ?? "0.00")</h4>
                     <div class="mb-0">
-                        <span class="text-muted">High: $@(btcTicker?.High.ToString("0.00") ?? "0.00")</span><br />
-                        <span class="text-muted">Low: $@(btcTicker?.Low.ToString("0.00") ?? "0.00")</span><br />
-                        <span class="text-muted">Volume: @(btcTicker?.Vol.ToString("0.00") ?? "0.00") BTC</span>
+                        <span class="text-muted">High: $@(btcTicker?.High.ToString("F2") ?? "0.00")</span><br />
+                        <span class="text-muted">Low: $@(btcTicker?.Low.ToString("F2") ?? "0.00")</span><br />
+                        <span class="text-muted">Volume: @(btcTicker?.Vol.ToString("F2") ?? "0.00") BTC</span>
                     </div>
                 </div>
             </div>
@@ -57,11 +57,11 @@
                             </div>
                         </div>
                     </div>
-                    <h4 class="mt-0 mb-1">$@(ethTicker?.Last.ToString("0.00") ?? "0.00")</h4>
+                    <h4 class="mt-0 mb-1">$@(ethTicker?.Last.ToString("F2") ?? "0.00")</h4>
                     <div class="mb-0">
-                        <span class="text-muted">High: $@(ethTicker?.High.ToString("0.00") ?? "0.00")</span><br />
-                        <span class="text-muted">Low: $@(ethTicker?.Low.ToString("0.00") ?? "0.00")</span><br />
-                        <span class="text-muted">Volume: @(ethTicker?.Vol.ToString("0.00") ?? "0.00") BTC</span>
+                        <span class="text-muted">High: $@(ethTicker?.High.ToString("F2") ?? "0.00")</span><br />
+                        <span class="text-muted">Low: $@(ethTicker?.Low.ToString("F2") ?? "0.00")</span><br />
+                        <span class="text-muted">Volume: @(ethTicker?.Vol.ToString("F2") ?? "0.00") BTC</span>
                     </div>
                 </div>
             </div>
@@ -77,11 +77,11 @@
                             <h5 class="card-title">Account Info</h5>
                         </div>
                     </div>
-                    <h4 class="mt-0 mb-1">Balance: $@(accountInfo?.Balance.ToString("0.00") ?? "0.00")</h4>
+                    <h4 class="mt-0 mb-1">Balance: $@(accountInfo?.Balance.ToString("F2") ?? "0.00")</h4>
                     <div class="mb-0">
-                        <span class="text-muted">BTC: @(accountInfo?.BtcBalance.ToString("0.0000") ?? "0.0000")</span><br />
-                        <span class="text-muted">ETH: @(accountInfo?.EthBalance.ToString("0.0000") ?? "0.0000")</span><br />
-                        <span class="text-muted">LTC: @(accountInfo?.LtcBalance.ToString("0.0000") ?? "0.0000")</span><br />
+                        <span class="text-muted">BTC: @(accountInfo?.BtcBalance.ToString("F2") ?? "0.0000")</span><br />
+                        <span class="text-muted">ETH: @(accountInfo?.EthBalance.ToString("F2") ?? "0.0000")</span><br />
+                        <span class="text-muted">LTC: @(accountInfo?.LtcBalance.ToString("F2") ?? "0.0000")</span><br />
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>@item.Coin</span>
-                                    <span>$@item.Item2.Ticker.High.ToString("0.00")</span>
+                                    <span>$@item.Item2.Ticker.High.ToString("F2")</span>
                                 </li>
                             }
                         </ul>
@@ -128,7 +128,7 @@
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <span>@item.Coin</span>
-                                    <span>$@item.Item2.Ticker.Low.ToString("0.00")</span>
+                                    <span>$@item.Item2.Ticker.Low.ToString("F2")</span>
                                 </li>
                             }
                         </ul>
