@@ -5,6 +5,8 @@
     var ethTicker = ViewBag.EthTicker?.Ticker;
     var xmrTicker = ViewBag.XmrTicker?.Ticker;
     var accountInfo = ViewBag.AccountInfo;
+    var topGainers = ViewBag.TopGainers as List<(string Coin, Expenses.Models.TickerResponse)>;
+    var lowestPrices = ViewBag.LowestPrices as List<(string Coin, Expenses.Models.TickerResponse)>;
 }
 
 <div class="container-fluid p-0">
@@ -14,8 +16,8 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12 col-md-6 col-xxl d-flex">
+    <div class="row text-dark">
+        <div class="col d-flex">
             <div class="card flex-fill">
                 <div class="card-body">
                     <div class="row">
@@ -23,24 +25,51 @@
                             <h5 class="card-title">BTC/USD</h5>
                         </div>
                         <div class="col-auto">
-                            <div class="stat" style="background: #F7931A; color: white;">
-                                <i class="fa-solid fa-bitcoin-sign align-middle"></i>
+                            <div class="stat rounded-circle pt-1 px-1" style="background: #F7931A; color: white;">
+                                <span class="material-symbols-outlined">
+                                    currency_bitcoin
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <h4 class="mt-0 mb-1">$@btcTicker?.Last</h4>
+                    <h4 class="mt-0 mb-1">$@(btcTicker?.Last.ToString("0.00") ?? "0.00")</h4>
                     <div class="mb-0">
-                        <span class="text-muted">High: $@btcTicker?.High</span><br />
-                        <span class="text-muted">Low: $@btcTicker?.Low</span><br />
-                        <span class="text-muted">Volume: @btcTicker?.Vol BTC</span>
+                        <span class="text-muted">High: $@(btcTicker?.High.ToString("0.00") ?? "0.00")</span><br />
+                        <span class="text-muted">Low: $@(btcTicker?.Low.ToString("0.00") ?? "0.00")</span><br />
+                        <span class="text-muted">Volume: @(btcTicker?.Vol.ToString("0.00") ?? "0.00") BTC</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Outros cards de criptomoedas -->
+        <div class="col d-flex">
+            <div class="card flex-fill">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">ETH/USD</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat rounded-circle pt-1 px-1" style="background: #627EEA; color: white;">
+                                <span class="material-symbols-outlined">
+                                    currency_bitcoin
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 class="mt-0 mb-1">$@(ethTicker?.Last.ToString("0.00") ?? "0.00")</h4>
+                    <div class="mb-0">
+                        <span class="text-muted">High: $@(ethTicker?.High.ToString("0.00") ?? "0.00")</span><br />
+                        <span class="text-muted">Low: $@(ethTicker?.Low.ToString("0.00") ?? "0.00")</span><br />
+                        <span class="text-muted">Volume: @(ethTicker?.Vol.ToString("0.00") ?? "0.00") BTC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <div class="col-12 col-md-6 col-xxl d-flex">
+        <!-- Account Info -->
+
+        <div class="col d-flex">
             <div class="card flex-fill">
                 <div class="card-body">
                     <div class="row">
@@ -48,12 +77,66 @@
                             <h5 class="card-title">Account Info</h5>
                         </div>
                     </div>
-                    <h4 class="mt-0 mb-1">Balance: $@accountInfo?.Balance</h4>
+                    <h4 class="mt-0 mb-1">Balance: $@(accountInfo?.Balance.ToString("0.00") ?? "0.00")</h4>
                     <div class="mb-0">
-                        <span class="text-muted">BTC: @accountInfo?.BtcBalance</span><br />
-                        <span class="text-muted">ETH: @accountInfo?.EthBalance</span><br />
-                        <span class="text-muted">LTC: @accountInfo?.LtcBalance</span><br />
+                        <span class="text-muted">BTC: @(accountInfo?.BtcBalance.ToString("0.0000") ?? "0.0000")</span><br />
+                        <span class="text-muted">ETH: @(accountInfo?.EthBalance.ToString("0.0000") ?? "0.0000")</span><br />
+                        <span class="text-muted">LTC: @(accountInfo?.LtcBalance.ToString("0.0000") ?? "0.0000")</span><br />
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="card flex-fill">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Top Gainers</h5>
+                </div>
+                <div class="card-body">
+                    @if (topGainers != null)
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in topGainers)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@item.Coin</span>
+                                    <span>$@item.Item2.Ticker.High.ToString("0.00")</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No data available</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card flex-fill">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Lowest Prices</h5>
+                </div>
+                <div class="card-body">
+                    @if (lowestPrices != null)
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in lowestPrices)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@item.Coin</span>
+                                    <span>$@item.Item2.Ticker.Low.ToString("0.00")</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No data available</p>
+                    }
                 </div>
             </div>
         </div>

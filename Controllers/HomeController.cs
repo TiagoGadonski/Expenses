@@ -1,7 +1,9 @@
 using Expenses.Data;
+using Expenses.Models;
 using Expenses.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Expenses.Controllers
 {
@@ -47,6 +49,11 @@ namespace Expenses.Controllers
             };
 
             return View(model);
+        }
+
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

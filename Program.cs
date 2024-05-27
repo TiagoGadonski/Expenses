@@ -1,23 +1,21 @@
 using Expenses.Data;
-using Expenses.Models;
 using Expenses.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-// Register MercadoBitcoinSettings
-builder.Services.Configure<MercadoBitcoinSettings>(builder.Configuration.GetSection("MercadoBitcoin"));
-
-// Register MercadoBitcoinService
-builder.Services.AddScoped<MercadoBitcoinService>();
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<MercadoBitcoinService>(provider =>
+{
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var apiKey = configuration["MercadoBitcoin:ApiKey"];
+    var apiSecret = configuration["MercadoBitcoin:ApiSecret"];
+    return new MercadoBitcoinService(apiKey, apiSecret);
+});
 
 var app = builder.Build();
 
@@ -25,12 +23,15 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
