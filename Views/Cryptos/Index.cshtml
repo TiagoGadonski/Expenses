@@ -141,4 +141,55 @@
             </div>
         </div>
     </div>
+
+    <div class="col-12 col-lg-12 col-xxl-3 d-flex">
+        <div class="card flex-fill">
+            <div class="card-header">
+                <div class="card-actions float-end">
+                    <input type="radio" class="btn-check" name="btnradio" id="buy" autocomplete="off" checked>
+                    <label class="btn btn-sm btn-primary" for="buy">Buy</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="sell" autocomplete="off">
+                    <label class="btn btn-sm btn-light" for="sell">Sell</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="send" autocomplete="off">
+                    <label class="btn btn-sm btn-light" for="send">Send</label>
+                </div>
+                <h5 class="card-title mb-0">Operations</h5>
+            </div>
+
+            <div class="card-body">
+                <p>Place new order:</p>
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text">Amount</label>
+                    <select class="form-select" style="max-width: 88px;">
+                        <option value="BTC" selected="">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="LTC">LTC</option>
+                        <option value="XMR">XMR</option>
+                    </select>
+                    <input type="text" class="form-control" value="0.25">
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text">Price</label>
+                    <input type="text" class="form-control" readonly value="23,077.05">
+                    <label class="input-group-text">$</label>
+                </div>
+
+                <div class="input-group mb-3">
+                    <label class="input-group-text">Total</label>
+                    <input type="text" class="form-control" readonly value="5,769.27">
+                    <label class="input-group-text">$</label>
+                </div>
+
+                <div class="d-grid">
+                    <button type="button" class="btn btn-primary mb-3">Process to wallet</button>
+                </div>
+
+                <p class="text-muted mb-0">The final amount could change depending on current market conditions.</p>
+            </div>
+        </div>
+    </div>
 </div>
