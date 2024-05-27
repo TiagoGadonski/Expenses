@@ -42,7 +42,7 @@ namespace Expenses.Controllers
             {
                 // Log the error (uncomment ex variable name and write a log.)
                 Console.WriteLine($"An error occurred: {ex.Message}");
-                return View("Error");
+                return View();
             }
         }
     }
