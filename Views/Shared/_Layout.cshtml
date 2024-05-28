@@ -10,14 +10,78 @@
 
     <script src="https://kit.fontawesome.com/7327329e64.js" crossorigin="anonymous"></script>
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            background-color: #343a40;
+            transition: all 0.3s;
+        }
+
+            .sidebar a {
+                color: #ffffff;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                transition: background 0.3s;
+            }
+
+                .sidebar a:hover {
+                    background-color: #495057;
+                }
+
+            .sidebar .fas {
+                margin-right: 15px;
+            }
+
+            .sidebar .active {
+                background-color: #495057;
+            }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+            .sidebar.collapsed .content {
+                margin-left: 80px;
+            }
+
+            .sidebar.collapsed a span {
+                display: none;
+            }
+
+            .sidebar.collapsed a .fas {
+                margin-right: 0;
+            }
+    </style>
 </head>
 <body>
     <header>
+        <!--
         <nav class="navbar navbar-expand-lg navbar-dark fw-bold text-uppercase box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand me-5" asp-area="" asp-controller="Home" asp-action="Index">
@@ -65,12 +129,102 @@
                 </div>
             </div>
         </nav>
+        -->
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fw-bold text-uppercase box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand me-5" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo white.png" alt="Logo" style="height: 60px;">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav flex-grow-1 gap-4">
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home me-2"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Expenses" asp-action="Index">
+                                <i class="fas fa-money-bill-wave me-2"></i> Expenses
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="WishlistItems" asp-action="Index">
+                                <i class="fas fa-list-alt me-2"></i> WishList
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="ExpenseGoals" asp-action="Index">
+                                <i class="fas fa-bullseye me-2"></i> Expense Goal
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Cryptos" asp-action="Index">
+                                <i class="fas fa-coins me-2"></i> Crypto
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Notes" asp-action="Index">
+                                <i class="fas fa-sticky-note me-2"></i> Notes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Reminders" asp-action="Index">
+                                <i class="fas fa-bell me-2"></i> Reminder
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="TaskItems" asp-action="Index">
+                                <i class="fas fa-tasks me-2"></i> TaskItems
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="News" asp-action="Index">
+                                <i class="fas fa-newspaper me-2"></i> News
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
     </header>
+    <!-- 
+    <div class="sidebar" id="sidebar">
+        <a href="#" class="active"><i class="fas fa-home"></i> <span>Home</span></a>
+        <a href="#"><i class="fas fa-money-bill-wave"></i> <span>Expenses</span></a>
+        <a href="#"><i class="fas fa-list-alt"></i> <span>WishList</span></a>
+        <a href="#"><i class="fas fa-bullseye"></i> <span>Expense Goal</span></a>
+        <a href="#"><i class="fas fa-coins"></i> <span>Crypto</span></a>
+        <a href="#"><i class="fas fa-sticky-note"></i> <span>Notes</span></a>
+        <a href="#"><i class="fas fa-bell"></i> <span>Reminder</span></a>
+        <a href="#"><i class="fas fa-tasks"></i> <span>TaskItems</span></a>
+        <a href="#"><i class="fas fa-newspaper"></i> <span>News</span></a>
+    </div>
+    <div class="content" id="content">
+        <button class="btn btn-primary" id="toggleSidebar">Toggle Sidebar</button>
+        
+        the main content come here
+            
+    </div>
+    -->
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+    <script>
+        document.getElementById('toggleSidebar').addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('content').classList.toggle('collapsed');
+        });
+    </script>
+    
 
     <footer class="border-top footer text-muted">
         <div class="container">

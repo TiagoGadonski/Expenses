@@ -11,6 +11,31 @@
     --card-text: #000000; /* Dark text color for contrast */
 }
 
+.navbar {
+    background-color: #343a40;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand img {
+    height: 60px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+
+    .nav-link:hover {
+        color: #adb5bd;
+    }
+
+    .nav-link .fas {
+        margin-right: 8px;
+    }
+
+
 /* Customizing Bootstrap classes */
 .btn-primary {
     background-color: var(--primary);
