@@ -3,6 +3,7 @@ using System;
 using Expenses.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Expenses.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240528132901_NotesReminder")]
+    partial class NotesReminder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
@@ -132,53 +135,6 @@ namespace Expenses.Migrations
                     b.ToTable("Incomes");
                 });
 
-            modelBuilder.Entity("Expenses.Models.News", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("NewsCategoryId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("VideoUrl")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NewsCategoryId");
-
-                    b.ToTable("News");
-                });
-
-            modelBuilder.Entity("Expenses.Models.NewsCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NewsCategories");
-                });
-
             modelBuilder.Entity("Expenses.Models.Note", b =>
                 {
                     b.Property<int>("Id")
@@ -224,72 +180,6 @@ namespace Expenses.Migrations
                     b.ToTable("Reminders");
                 });
 
-            modelBuilder.Entity("Expenses.Models.TaskCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TaskCategories");
-                });
-
-            modelBuilder.Entity("Expenses.Models.TaskColumn", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TaskColumns");
-                });
-
-            modelBuilder.Entity("Expenses.Models.TaskItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TaskCategoryId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("TaskColumnId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TaskCategoryId");
-
-                    b.HasIndex("TaskColumnId");
-
-                    b.ToTable("TaskItems");
-                });
-
             modelBuilder.Entity("Expenses.Models.WishlistItem", b =>
                 {
                     b.Property<int>("Id")
@@ -319,51 +209,6 @@ namespace Expenses.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WishlistItems");
-                });
-
-            modelBuilder.Entity("Expenses.Models.News", b =>
-                {
-                    b.HasOne("Expenses.Models.NewsCategory", "NewsCategory")
-                        .WithMany("News")
-                        .HasForeignKey("NewsCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NewsCategory");
-                });
-
-            modelBuilder.Entity("Expenses.Models.TaskItem", b =>
-                {
-                    b.HasOne("Expenses.Models.TaskCategory", "TaskCategory")
-                        .WithMany("TaskItems")
-                        .HasForeignKey("TaskCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Expenses.Models.TaskColumn", "TaskColumn")
-                        .WithMany("TaskItems")
-                        .HasForeignKey("TaskColumnId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TaskCategory");
-
-                    b.Navigation("TaskColumn");
-                });
-
-            modelBuilder.Entity("Expenses.Models.NewsCategory", b =>
-                {
-                    b.Navigation("News");
-                });
-
-            modelBuilder.Entity("Expenses.Models.TaskCategory", b =>
-                {
-                    b.Navigation("TaskItems");
-                });
-
-            modelBuilder.Entity("Expenses.Models.TaskColumn", b =>
-                {
-                    b.Navigation("TaskItems");
                 });
 #pragma warning restore 612, 618
         }

@@ -19,16 +19,12 @@ namespace Expenses.Controllers
             var ethTicker = await _mercadoBitcoinService.GetTickerAsync("ETH");
             var xmrTicker = await _mercadoBitcoinService.GetTickerAsync("XMR");
             var accountInfo = await _mercadoBitcoinService.GetAccountInfoAsync();
-            var topGainers = await _mercadoBitcoinService.GetTopGainersAsync();
-            var lowestPrices = await _mercadoBitcoinService.GetLowestPricesAsync();
 
             ViewBag.BtcTicker = btcTicker;
             ViewBag.LtcTicker = ltcTicker;
             ViewBag.EthTicker = ethTicker;
             ViewBag.XmrTicker = xmrTicker;
             ViewBag.AccountInfo = accountInfo;
-            ViewBag.TopGainers = topGainers;
-            ViewBag.LowestPrices = lowestPrices;
 
             return View();
         }

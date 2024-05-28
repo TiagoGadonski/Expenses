@@ -18,23 +18,18 @@ namespace Expenses.Controllers
         {
             try
             {
-                var btcTicker = await _mercadoBitcoinService.GetTickerAsync("BTC");
-                var ltcTicker = await _mercadoBitcoinService.GetTickerAsync("LTC");
-                var ethTicker = await _mercadoBitcoinService.GetTickerAsync("ETH");
-                var xmrTicker = await _mercadoBitcoinService.GetTickerAsync("XMR");
+                var allTickers = await _mercadoBitcoinService.GetAllTickersAsync();
                 var accountInfo = await _mercadoBitcoinService.GetAccountInfoAsync();
 
-                ViewBag.BtcTicker = btcTicker;
-                ViewBag.LtcTicker = ltcTicker;
-                ViewBag.EthTicker = ethTicker;
-                ViewBag.XmrTicker = xmrTicker;
+                ViewBag.AllTickers = allTickers;
                 ViewBag.AccountInfo = accountInfo;
 
-                var topGainers = await _mercadoBitcoinService.GetTopGainersAsync();
-                var lowestPrices = await _mercadoBitcoinService.GetLowestPricesAsync();
+                var topGainers = allTickers.OrderByDescending(t => t.Ticker.Ticker.High).Take(5).ToList();
+                var lowestPrices = allTickers.OrderBy(t => t.Ticker.Ticker.Low).Take(5).ToList();
 
                 ViewBag.TopGainers = topGainers;
                 ViewBag.LowestPrices = lowestPrices;
+                ViewBag.GetCoinName = new Func<string, string>(_mercadoBitcoinService.GetCoinName);
 
                 return View();
             }

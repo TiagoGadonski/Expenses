@@ -1,12 +1,10 @@
 ﻿@{
     ViewData["Title"] = "Crypto Dashboard";
-    var btcTicker = ViewBag.BtcTicker?.Ticker;
-    var ltcTicker = ViewBag.LtcTicker?.Ticker;
-    var ethTicker = ViewBag.EthTicker?.Ticker;
-    var xmrTicker = ViewBag.XmrTicker?.Ticker;
+    var allTickers = ViewBag.AllTickers as List<(string Coin, Expenses.Models.TickerResponse)>;
     var accountInfo = ViewBag.AccountInfo;
     var topGainers = ViewBag.TopGainers as List<(string Coin, Expenses.Models.TickerResponse)>;
     var lowestPrices = ViewBag.LowestPrices as List<(string Coin, Expenses.Models.TickerResponse)>;
+    Func<string, string> getCoinName = ViewBag.GetCoinName;
 }
 
 <div class="container-fluid p-0">
@@ -16,59 +14,35 @@
         </div>
     </div>
 
+    <!-- All Tickers -->
     <div class="row text-dark">
-        <div class="col d-flex">
-            <div class="card flex-fill">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col mt-0">
-                            <h5 class="card-title">BTC/USD</h5>
-                        </div>
-                        <div class="col-auto">
-                            <div class="stat rounded-circle pt-1 px-1" style="background: #F7931A; color: white;">
-                                <span class="material-symbols-outlined">
-                                    currency_bitcoin
-                                </span>
+        @if (allTickers != null)
+        {
+            @foreach (var item in allTickers)
+            {
+                <div class="col d-flex">
+                    <div class="card flex-fill">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col mt-0">
+                                    <h5 class="card-title">@getCoinName(item.Coin)/USD</h5>
+                                </div>
+                            </div>
+                            <h4 class="mt-0 mb-1">$@(item.Item2.Ticker.Last.ToString("F2"))</h4>
+                            <div class="mb-0">
+                                <span class="text-muted">High: $@(item.Item2.Ticker.High.ToString("F2"))</span><br />
+                                <span class="text-muted">Low: $@(item.Item2.Ticker.Low.ToString("F2"))</span><br />
+                                <span class="text-muted">Volume: @(item.Item2.Ticker.Vol.ToString("F2")) BTC</span>
                             </div>
                         </div>
                     </div>
-                    <h4 class="mt-0 mb-1">$@(btcTicker?.Last.ToString("0.00") ?? "0.00")</h4>
-                    <div class="mb-0">
-                        <span class="text-muted">High: $@(btcTicker?.High.ToString("F2") ?? "0.00")</span><br />
-                        <span class="text-muted">Low: $@(btcTicker?.Low.ToString("F2") ?? "0.00")</span><br />
-                        <span class="text-muted">Volume: @(btcTicker?.Vol.ToString("F2") ?? "0.00") BTC</span>
-                    </div>
                 </div>
-            </div>
-        </div>
+            }
+        }
+    </div>
 
-        <div class="col d-flex">
-            <div class="card flex-fill">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col mt-0">
-                            <h5 class="card-title">ETH/USD</h5>
-                        </div>
-                        <div class="col-auto">
-                            <div class="stat rounded-circle pt-1 px-1" style="background: #627EEA; color: white;">
-                                <span class="material-symbols-outlined">
-                                    currency_bitcoin
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <h4 class="mt-0 mb-1">$@(ethTicker?.Last.ToString("F2") ?? "0.00")</h4>
-                    <div class="mb-0">
-                        <span class="text-muted">High: $@(ethTicker?.High.ToString("F2") ?? "0.00")</span><br />
-                        <span class="text-muted">Low: $@(ethTicker?.Low.ToString("F2") ?? "0.00")</span><br />
-                        <span class="text-muted">Volume: @(ethTicker?.Vol.ToString("F2") ?? "0.00") BTC</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Account Info -->
-
+    <!-- Account Info -->
+    <div class="row text-dark">
         <div class="col d-flex">
             <div class="card flex-fill">
                 <div class="card-body">
@@ -79,15 +53,16 @@
                     </div>
                     <h4 class="mt-0 mb-1">Balance: $@(accountInfo?.Balance.ToString("F2") ?? "0.00")</h4>
                     <div class="mb-0">
-                        <span class="text-muted">BTC: @(accountInfo?.BtcBalance.ToString("F2") ?? "0.0000")</span><br />
-                        <span class="text-muted">ETH: @(accountInfo?.EthBalance.ToString("F2") ?? "0.0000")</span><br />
-                        <span class="text-muted">LTC: @(accountInfo?.LtcBalance.ToString("F2") ?? "0.0000")</span><br />
+                        <span class="text-muted">BTC: @(accountInfo?.BtcBalance.ToString("F4") ?? "0.0000")</span><br />
+                        <span class="text-muted">ETH: @(accountInfo?.EthBalance.ToString("F4") ?? "0.0000")</span><br />
+                        <span class="text-muted">LTC: @(accountInfo?.LtcBalance.ToString("F4") ?? "0.0000")</span><br />
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Top Gainers -->
     <div class="row">
         <div class="col-12 col-md-6">
             <div class="card flex-fill">
@@ -101,7 +76,7 @@
                             @foreach (var item in topGainers)
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>@item.Coin</span>
+                                    <span>@getCoinName(item.Coin)</span>
                                     <span>$@item.Item2.Ticker.High.ToString("F2")</span>
                                 </li>
                             }
@@ -115,6 +90,7 @@
             </div>
         </div>
 
+        <!-- Lowest Prices -->
         <div class="col-12 col-md-6">
             <div class="card flex-fill">
                 <div class="card-header">
@@ -127,7 +103,7 @@
                             @foreach (var item in lowestPrices)
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>@item.Coin</span>
+                                    <span>@getCoinName(item.Coin)</span>
                                     <span>$@item.Item2.Ticker.Low.ToString("F2")</span>
                                 </li>
                             }
@@ -138,57 +114,6 @@
                         <p class="text-muted">No data available</p>
                     }
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-12 col-lg-12 col-xxl-3 d-flex">
-        <div class="card flex-fill">
-            <div class="card-header">
-                <div class="card-actions float-end">
-                    <input type="radio" class="btn-check" name="btnradio" id="buy" autocomplete="off" checked>
-                    <label class="btn btn-sm btn-primary" for="buy">Buy</label>
-
-                    <input type="radio" class="btn-check" name="btnradio" id="sell" autocomplete="off">
-                    <label class="btn btn-sm btn-light" for="sell">Sell</label>
-
-                    <input type="radio" class="btn-check" name="btnradio" id="send" autocomplete="off">
-                    <label class="btn btn-sm btn-light" for="send">Send</label>
-                </div>
-                <h5 class="card-title mb-0">Operations</h5>
-            </div>
-
-            <div class="card-body">
-                <p>Place new order:</p>
-
-                <div class="input-group mb-3">
-                    <label class="input-group-text">Amount</label>
-                    <select class="form-select" style="max-width: 88px;">
-                        <option value="BTC" selected="">BTC</option>
-                        <option value="ETH">ETH</option>
-                        <option value="LTC">LTC</option>
-                        <option value="XMR">XMR</option>
-                    </select>
-                    <input type="text" class="form-control" value="0.25">
-                </div>
-
-                <div class="input-group mb-3">
-                    <label class="input-group-text">Price</label>
-                    <input type="text" class="form-control" readonly value="23,077.05">
-                    <label class="input-group-text">$</label>
-                </div>
-
-                <div class="input-group mb-3">
-                    <label class="input-group-text">Total</label>
-                    <input type="text" class="form-control" readonly value="5,769.27">
-                    <label class="input-group-text">$</label>
-                </div>
-
-                <div class="d-grid">
-                    <button type="button" class="btn btn-primary mb-3">Process to wallet</button>
-                </div>
-
-                <p class="text-muted mb-0">The final amount could change depending on current market conditions.</p>
             </div>
         </div>
     </div>

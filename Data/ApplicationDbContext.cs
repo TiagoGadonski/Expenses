@@ -11,7 +11,14 @@ namespace Expenses.Data
         public DbSet<CategoryWishlist> CategoryWishlists { get; set; }
         public DbSet<ExpenseGoal> ExpenseGoals { get; set; }
         public DbSet<Income> Incomes { get; set; }
-                
+        public DbSet<Note> Notes { get; set; }
+        public DbSet<Reminder> Reminders { get; set; }
+        public DbSet<News> News { get; set; }
+        public DbSet<NewsCategory> NewsCategories { get; set; }
+        public DbSet<TaskItem> TaskItems { get; set; }
+        public DbSet<TaskCategory> TaskCategories { get; set; }
+        public DbSet<TaskColumn> TaskColumns { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

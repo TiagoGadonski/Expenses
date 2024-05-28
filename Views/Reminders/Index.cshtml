@@ -1,0 +1,37 @@
+﻿@model IEnumerable<Expenses.Models.Reminder>
+
+<h2>Reminders</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Reminder</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Reminder Date & Time
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Title
+                </td>
+                <td>
+                    @item.ReminderDateTime
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

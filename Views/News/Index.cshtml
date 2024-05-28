@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Expenses.Models.News>
+
+<h2>News</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New News</a>
+</p>
+
+@foreach (var item in Model)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">@item.Title</h5>
+            <p class="card-text">@item.Content</p>
+            <p>Category: @item.NewsCategory.Name</p>
+            @if (!string.IsNullOrEmpty(item.VideoUrl))
+            {
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="@item.VideoUrl" allowfullscreen></iframe>
+                </div>
+            }
+            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary mt-2">Edit</a>
+        </div>
+    </div>
+}
