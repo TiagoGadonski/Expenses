@@ -1,0 +1,39 @@
+﻿@model Newtonsoft.Json.Linq.JObject
+
+<h1>Latest Crypto Listings</h1>
+@if (Model["data"] != null)
+{
+    <table class="text-white">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Price (BRL)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cryptocurrency in Model["data"])
+            {
+                <tr>
+                    <td>@cryptocurrency["name"]?.ToString()</td>
+                    <td>@cryptocurrency["symbol"]?.ToString()</td>
+                    <td>
+                        @if (cryptocurrency["quote"]?["BRL"]?["price"] != null)
+                        {
+                            @string.Format("{0:N2}", cryptocurrency["quote"]["BRL"]["price"])
+                        }
+                        else
+                        {
+                            @:N/A
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No data available.</p>
+}
+

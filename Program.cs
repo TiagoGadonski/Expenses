@@ -17,6 +17,13 @@ builder.Services.AddScoped<MercadoBitcoinService>(provider =>
     return new MercadoBitcoinService(apiKey, apiSecret);
 });
 
+builder.Services.AddHttpClient<CoinMarketCapService>(client =>
+{
+    client.BaseAddress = new Uri("https://pro-api.coinmarketcap.com");
+});
+
+builder.Services.AddSingleton(new CoinMarketCapService(new HttpClient(), "145bcacc-f453-435b-81f4-e4a4f0cf1e8c"));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
