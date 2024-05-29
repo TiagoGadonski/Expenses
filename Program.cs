@@ -45,4 +45,22 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    endpoints.MapControllerRoute(
+        name: "crypto",
+        pattern: "crypto/{action=CryptoList}/{id?}",
+        defaults: new { controller = "Crypto" });
+
+    endpoints.MapControllerRoute(
+        name: "cryptoMarketOverview",
+        pattern: "crypto/marketoverview",
+        defaults: new { controller = "Crypto", action = "MarketOverview" });
+});
+
+
 app.Run();

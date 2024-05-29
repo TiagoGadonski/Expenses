@@ -1,6 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 public class CoinMarketCapService
 {
@@ -13,7 +11,7 @@ public class CoinMarketCapService
         _apiKey = apiKey;
     }
 
-    public async Task<JObject> GetLatestListingsAsync(int limit = 10)
+    public async Task<JObject> GetLatestListingsAsync(int limit = 100)
     {
         var request = new HttpRequestMessage
         {
@@ -32,5 +30,38 @@ public class CoinMarketCapService
             var responseBody = await response.Content.ReadAsStringAsync();
             return JObject.Parse(responseBody);
         }
+    }
+
+    public async Task<JObject> GetMarketOverviewAsync()
+    {
+        var data = await GetLatestListingsAsync();
+
+        var mostExpensive = data["data"]
+            .OrderByDescending(c => (decimal)c["quote"]["BRL"]["price"])
+            .Take(10);
+
+        var cheapest = data["data"]
+            .OrderBy(c => (decimal)c["quote"]["BRL"]["price"])
+            .Take(10);
+
+        var topGainers = data["data"]
+            .OrderByDescending(c => (decimal)c["quote"]["BRL"]["percent_change_24h"])
+            .Take(10);
+
+        var topLosers = data["data"]
+            .OrderBy(c => (decimal)c["quote"]["BRL"]["percent_change_24h"])
+            .Take(10);
+
+        var marketOverview = new JObject
+        {
+            ["mostExpensive"] = new JArray(mostExpensive),
+            ["cheapest"] = new JArray(cheapest),
+            ["topGainers"] = new JArray(topGainers),
+            ["topLosers"] = new JArray(topLosers),
+            ["totalMarketCap"] = data["data"].Sum(c => (decimal)c["quote"]["BRL"]["market_cap"]),
+            ["totalVolume24h"] = data["data"].Sum(c => (decimal)c["quote"]["BRL"]["volume_24h"])
+        };
+
+        return marketOverview;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 public class CryptoController : Controller
 {
@@ -10,16 +9,9 @@ public class CryptoController : Controller
         _coinMarketCapService = coinMarketCapService;
     }
 
-    public async Task<IActionResult> CryptoList()
+    public async Task<IActionResult> MarketOverview()
     {
-        var listings = await _coinMarketCapService.GetLatestListingsAsync();
-
-        if (listings == null || listings["data"] == null)
-        {
-            // Handle the error or return a view with an error message
-            return View("Error", "Unable to retrieve data from CoinMarketCap.");
-        }
-
-        return View(listings);
+        var overview = await _coinMarketCapService.GetMarketOverviewAsync();
+        return View(overview);
     }
 }
