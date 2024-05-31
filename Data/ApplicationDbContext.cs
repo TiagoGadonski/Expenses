@@ -18,10 +18,18 @@ namespace Expenses.Data
         public DbSet<TaskItem> TaskItems { get; set; }
         public DbSet<TaskCategory> TaskCategories { get; set; }
         public DbSet<TaskColumn> TaskColumns { get; set; }
+        public DbSet<CryptoPrice> CryptoPrices { get; set; }
+        public DbSet<CryptoNews> CryptoNews { get; set; }
+        public DbSet<CryptoFeedback> CryptoFeedbacks { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
