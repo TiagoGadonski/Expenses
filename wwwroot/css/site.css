@@ -128,6 +128,25 @@ body {
     color: var(--card-text);
 }
 
+.custom-card {
+    background-color: #d4edda; /* Fundo verde claro */
+    border: none; /* Remova as bordas do card */
+    color: #155724; /* Texto em verde escuro para contraste */
+}
+
+    .custom-card h4.fw-bolder {
+        color: #155724; /* Texto em verde escuro */
+    }
+
+    .custom-card .text-muted {
+        color: #155724; /* Texto em verde escuro */
+    }
+
+    .custom-card .text-end {
+        color: #155724; /* Texto em verde escuro */
+    }
+
+
 .btn-icon {
     display: flex;
     align-items: center;

@@ -1,200 +1,238 @@
-﻿@model Newtonsoft.Json.Linq.JObject
+﻿@model dynamic
 
-@{
-    Layout = "_Layout";
-    ViewData["Title"] = "Market Overview";
-}
-<div class="container-fluid p-0">
 
-    <div class="row mb-3 mb-xl-3">
-        <div class="col-auto d-none d-sm-block">
-            <h3><strong>Market Overview</strong> (Last 24h)</h3>
-        </div>
-    </div>
+<div class="container mt-5 text-light bg-dark">
+    <div class="col-12 col-lg-12 col-xxl-3 d-flex">
+        <div class="card flex-fill">
+            <div class="card-header text-dark">
+                <div class="card-actions float-end">
+                    <input type="radio" class="btn-check" name="btnradio" id="buy" autocomplete="off" checked>
+                    <label class="btn btn-sm btn-primary" for="buy">Buy</label>
 
-    <div class="row mb-3">
-        <div class="col col-md-6 col-xxl d-flex">
-            <div class="card flex-fill">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col mt-0">
-                            <h5 class="card-title">Total Market Cap</h5>
-                        </div>
-
-                        <div class="col-auto">
-                            <div class="stat" style="">
-                                <i class="fa-solid fa-dollar-sign align-middle"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <h4 class="mt-0 mb-1">@string.Format("{0:N2}", Model["totalMarketCap"]) <span class="text-muted">BRL</span></h4>
-
+                    <input type="radio" class="btn-check" name="btnradio" id="sell" autocomplete="off">
+                    <label class="btn btn-sm btn-light" for="sell">Sell</label>
                 </div>
+                <h5 class="card-title mb-0">Operations</h5>
             </div>
-        </div>
-        <div class="col col-md-6 col-xxl d-flex">
-            <div class="card flex-fill">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col mt-0">
-                            <h5 class="card-title">Total Volume (24h)</h5>
-                        </div>
 
-                        <div class="col-auto">
-                            <div class="stat" style="background: #F7931A; color: white;">
-                                <i class="fa-solid fa-bitcoin-sign align-middle"></i>
-                            </div>
-                        </div>
+            <div class="card-body text-black">
+                <form method="post" id="buyForm" action="/crypto/buy">
+                    <p>Place new buy order:</p>
+
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="coinPairBuy">Coin Pair</label>
+                        <input type="text" class="form-control" id="coinPairBuy" name="coinPair" placeholder="e.g., BRLBTC" required>
                     </div>
-                    <h4 class="mt-0 mb-1">@string.Format("{0:N2}", Model["totalVolume24h"])<span class="text-muted">BRL</span></h4>
 
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="row mb-3">
-        <div class="col col-md-6 col-xxl d-flex">
-            <div class="card flex-fill">
-                <div class="card-header">
-                    <div class="card-actions float-end">
-                        <span class="material-symbols-outlined">
-                            currency_exchange
-                        </span>
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="quantityBuy">Amount</label>
+                        <input type="number" class="form-control" id="quantityBuy" name="quantity" step="0.00000001" required>
                     </div>
-                    <h5 class="card-title mb-0">Most Expensive Cryptocurrencies</h5>
-                </div>
-                <table class="table table-sm table-striped my-0">
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-star fa-sm cursor-pointer"></i></th>
-                            <th>Coin</th>
-                            <th>Symbol</th>
-                            <th class="d-none d-xl-table-cell">Price (BRL)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var cryptocurrency in Model["mostExpensive"])
-                        {
-                            <tr>
-                                <td><i class="fas fa-star fa-sm cursor-pointer"></i></td>
-                                <td>@cryptocurrency["name"]?.ToString()</td>
-                                <td class="text-end">@cryptocurrency["symbol"]?.ToString()</td>
-                                <td class="d-none d-xl-table-cell text-end">@string.Format("{0:N2}", cryptocurrency["quote"]["BRL"]["price"])</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <div class="col col-md-6 col-xxl d-flex">
-            <div class="card flex-fill">
-                <div class="card-header">
-                    <div class="card-actions float-end">
-                        <div class="dropdown position-relative">
-                            <span class="material-symbols-outlined">
-                                currency_exchange
-                            </span>
-                        </div>
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="limitPriceBuy">Price</label>
+                        <input type="number" class="form-control" id="limitPriceBuy" name="limitPrice" step="0.01" required>
+                        <label class="input-group-text">$</label>
                     </div>
-                    <h5 class="card-title mb-0">Cheapest Cryptocurrencies</h5>
-                </div>
-                <table class="table table-sm table-striped my-0">
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-star fa-sm cursor-pointer"></i></th>
-                            <th>Coin</th>
-                            <th>Symbol</th>
-                            <th class="d-none d-xl-table-cell">Price (BRL)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var cryptocurrency in Model["cheapest"])
-                        {
-                            <tr>
-                                <td><i class="fas fa-star fa-sm cursor-pointer"></i></td>
-                                <td>@cryptocurrency["name"]?.ToString()</td>
-                                <td class="text-end">@cryptocurrency["symbol"]?.ToString()</td>
-                                <td class="d-none d-xl-table-cell text-end">@cryptocurrency["quote"]["BRL"]["price"]</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary mb-3">Place Buy Order</button>
+                    </div>
+                </form>
+
+                <form method="post" id="sellForm" action="/crypto/sell" style="display:none;">
+                    <p>Place new sell order:</p>
+
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="coinPairSell">Coin Pair</label>
+                        <input type="text" class="form-control" id="coinPairSell" name="coinPair" placeholder="e.g., BRLBTC" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="quantitySell">Amount</label>
+                        <input type="number" class="form-control" id="quantitySell" name="quantity" step="0.00000001" required>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <label class="input-group-text" for="limitPriceSell">Price</label>
+                        <input type="number" class="form-control" id="limitPriceSell" name="limitPrice" step="0.01" required>
+                        <label class="input-group-text">$</label>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary mb-3">Place Sell Order</button>
+                    </div>
+                </form>
+
+                <p class="text-muted mb-0">The final amount could change depending on current market conditions.</p>
             </div>
         </div>
     </div>
 
+    <script>
+        document.getElementById('buy').addEventListener('click', function () {
+            document.getElementById('buyForm').style.display = 'block';
+            document.getElementById('sellForm').style.display = 'none';
+        });
 
-    <div class="row">
-        <div class="col col-md-6 col-xxl d-flex">
-            <div class="card flex-fill">
-                <div class="card-header">
-                    <div class="card-actions float-end">
-                        <span class="material-symbols-outlined">
-                            trending_up
-                        </span>
-                    </div>
-                    <h5 class="card-title mb-0">Top Gainers (24h)</h5>
-                </div>
-                <table class="table table-sm table-striped my-0">
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-star fa-sm cursor-pointer"></i></th>
-                            <th>Coin</th>
-                            <th>Symbol</th>
-                            <th class="d-none d-xl-table-cell">Change (24h %)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var cryptocurrency in Model["topGainers"])
-                        {
-                            <tr>
-                                <td><i class="fas fa-star fa-sm cursor-pointer"></i></td>
-                                <td>@cryptocurrency["name"]?.ToString()</td>
-                                <td class="text-end">@cryptocurrency["symbol"]?.ToString()</td>
-                                <td class="d-none d-xl-table-cell text-end">@string.Format("{0:N2}", cryptocurrency["quote"]["BRL"]["percent_change_24h"])%</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        document.getElementById('sell').addEventListener('click', function () {
+            document.getElementById('buyForm').style.display = 'none';
+            document.getElementById('sellForm').style.display = 'block';
+        });
+    </script>
+    <h1>Market Overview (Last 24h)</h1>
 
-        <div class="col col-md-6 col-xxl d-flex">
-            <div class="card flex-fill">
-                <div class="card-header">
-                    <div class="card-actions float-end">
-                        <span class="material-symbols-outlined">
-                            trending_down
-                        </span>
-                    </div>
-                    <h5 class="card-title mb-0">Top Losers (24h)</h5>
-                </div>
-                <table class="table table-sm table-striped my-0">
-                    <thead>
-                        <tr>
-                            <th><i class="fas fa-star fa-sm cursor-pointer"></i></th>
-                            <th>Coin</th>
-                            <th>Symbol</th>
-                            <th class="d-none d-xl-table-cell">Change (24h %)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var cryptocurrency in Model["topLosers"])
-                        {
-                            <tr>
-                                <td><i class="fas fa-star fa-sm cursor-pointer"></i></td>
-                                <td>@cryptocurrency["name"]?.ToString()</td>
-                                <td class="text-end">@cryptocurrency["symbol"]?.ToString()</td>
-                                <td class="d-none d-xl-table-cell text-end">@string.Format("{0:N2}", cryptocurrency["quote"]["BRL"]["percent_change_24h"])%</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <h2>
+        Total Market Cap:
+        <span data-toggle="tooltip" title="Total market capitalization of all cryptocurrencies">
+            @Model.MarketOverview["totalMarketCap"] BRL
+        </span>
+    </h2>
+    <h2>
+        Total Volume (24h):
+        <span data-toggle="tooltip" title="Total trading volume in the last 24 hours">
+            @Model.MarketOverview["totalVolume24h"] BRL
+        </span>
+    </h2>
+
+    <h2>Account Balance</h2>
+    @if (Model.AccountBalance != null && Model.AccountBalance["balance"] != null)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Asset</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var balance in Model.AccountBalance["balance"])
+                {
+                    <tr>
+                        <td>@balance["asset"]?.ToString()</td>
+                        <td>@balance["available"]?.ToString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No account balance information available.</p>
+    }
+
+    <h2>Most Expensive Cryptocurrencies</h2>
+    <table class="table text-light">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Price (BRL)</th>
+                <th>Market Cap (BRL)</th>
+                <th>Supply</th>
+                <th>Change (24h %)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cryptocurrency in Model.MarketOverview["mostExpensive"])
+            {
+                <tr>
+                    <td>@cryptocurrency["name"]?.ToString()</td>
+                    <td>@cryptocurrency["symbol"]?.ToString()</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["price"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["market_cap"]</td>
+                    <td>@cryptocurrency["circulating_supply"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["percent_change_24h"]</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2>Cheapest Cryptocurrencies</h2>
+    <table class="table text-light">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Price (BRL)</th>
+                <th>Market Cap (BRL)</th>
+                <th>Supply</th>
+                <th>Change (24h %)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cryptocurrency in Model.MarketOverview["cheapest"])
+            {
+                <tr>
+                    <td>@cryptocurrency["name"]?.ToString()</td>
+                    <td>@cryptocurrency["symbol"]?.ToString()</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["price"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["market_cap"]</td>
+                    <td>@cryptocurrency["circulating_supply"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["percent_change_24h"]</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2>Top Gainers (24h)</h2>
+    <table class="table text-light">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Price (BRL)</th>
+                <th>Market Cap (BRL)</th>
+                <th>Supply</th>
+                <th>Change (24h %)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cryptocurrency in Model.MarketOverview["topGainers"])
+            {
+                <tr>
+                    <td>@cryptocurrency["name"]?.ToString()</td>
+                    <td>@cryptocurrency["symbol"]?.ToString()</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["price"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["market_cap"]</td>
+                    <td>@cryptocurrency["circulating_supply"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["percent_change_24h"]</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2>Top Losers (24h)</h2>
+    <table class="table text-light">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Symbol</th>
+                <th>Price (BRL)</th>
+                <th>Market Cap (BRL)</th>
+                <th>Supply</th>
+                <th>Change (24h %)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cryptocurrency in Model.MarketOverview["topLosers"])
+            {
+                <tr>
+                    <td>@cryptocurrency["name"]?.ToString()</td>
+                    <td>@cryptocurrency["symbol"]?.ToString()</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["price"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["market_cap"]</td>
+                    <td>@cryptocurrency["circulating_supply"]</td>
+                    <td>@cryptocurrency["quote"]["BRL"]["percent_change_24h"]</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
 

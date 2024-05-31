@@ -9,21 +9,22 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<MercadoBitcoinService>(provider =>
-{
-    var configuration = provider.GetRequiredService<IConfiguration>();
-    var apiKey = configuration["MercadoBitcoin:ApiKey"];
-    var apiSecret = configuration["MercadoBitcoin:ApiSecret"];
-    return new MercadoBitcoinService(apiKey, apiSecret);
-});
-
 builder.Services.AddHttpClient<CoinMarketCapService>(client =>
 {
     client.BaseAddress = new Uri("https://pro-api.coinmarketcap.com");
 });
 
-builder.Services.AddSingleton(new CoinMarketCapService(new HttpClient(), "145bcacc-f453-435b-81f4-e4a4f0cf1e8c"));
+builder.Services.AddSingleton<CoinMarketCapService>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient("CoinMarketCapService");
+    return new CoinMarketCapService(httpClient, "145bcacc-f453-435b-81f4-e4a4f0cf1e8c");
+});
 
+builder.Services.AddSingleton<MercadoBitcoinService>(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient("MercadoBitcoinService");
+    return new MercadoBitcoinService(httpClient, "cb23ede8f8cf0b7b969938f2b90ba9a8a9bb3611ee9fa1990402b79f8d937df8", "6408ead524f515ff46555eed79f6a1ee0196bfbd5a8a57e877498275fec28df4");
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

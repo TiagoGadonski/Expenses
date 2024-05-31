@@ -1,88 +1,75 @@
-﻿using Expenses.Models;
-using RestSharp;
+﻿using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Expenses.Services
 {
     public class MercadoBitcoinService
     {
-        private readonly RestClient _client;
         private readonly string _apiKey;
         private readonly string _apiSecret;
+        private readonly HttpClient _httpClient;
 
-        private readonly Dictionary<string, string> _coinNames = new Dictionary<string, string>
+        public MercadoBitcoinService(HttpClient httpClient, string apiKey, string apiSecret)
         {
-            { "BTC", "Bitcoin" },
-            { "ETH", "Ethereum" },
-            { "XRP", "Ripple" },
-            { "ADA", "Cardano" },
-            { "PEPE", "PepeCoin" },
-            { "DOGE", "Dogecoin" },
-            { "DOT", "Polkadot" },
-            { "UNI", "Uniswap" },
-            { "LTC", "Litecoin" },
-            { "BCH", "Bitcoin Cash" }
-            // Adicione mais moedas conforme necessário
-        };
-
-        public MercadoBitcoinService(string apiKey, string apiSecret)
-        {
-            _client = new RestClient("https://www.mercadobitcoin.net/api");
             _apiKey = apiKey;
             _apiSecret = apiSecret;
+            _httpClient = httpClient;
         }
 
-        public async Task<TickerResponse> GetTickerAsync(string coin)
+        private string CreateSignature(string queryString)
         {
-            var request = new RestRequest($"{coin}/ticker/", Method.Get);
-            var response = await _client.ExecuteAsync<TickerResponse>(request);
-
-            if (response.Data == null)
+            using (var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(_apiSecret)))
             {
-                throw new Exception($"Failed to get ticker for {coin}");
+                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(queryString));
+                return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
-
-            return response.Data;
         }
 
-        private async Task<(string Coin, TickerResponse Ticker)> GetTickerWithCoinAsync(string coin)
+        private async Task<JObject> SendRequestAsync(string method, string queryString)
         {
-            var ticker = await GetTickerAsync(coin);
-            return (coin, ticker);
-        }
+            string endpoint = "/tapi/v3/";
+            string nonce = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+            string signature = CreateSignature(queryString);
 
-        public async Task<List<(string Coin, TickerResponse Ticker)>> GetAllTickersAsync()
-        {
-            var coins = await GetAvailableCoinsAsync();
-            var tasks = coins.Select(coin => GetTickerWithCoinAsync(coin)).ToList();
-            var tickers = await Task.WhenAll(tasks);
-            return tickers.Where(t => t.Ticker != null && t.Ticker.Ticker != null).ToList();
-        }
-
-        private async Task<List<string>> GetAvailableCoinsAsync()
-        {
-            // Simulating a call to an endpoint that would return all available coins.
-            // In a real scenario, replace this with an actual API call if available.
-            return _coinNames.Keys.ToList();
-        }
-
-        public async Task<AccountInfoResponse> GetAccountInfoAsync()
-        {
-            var request = new RestRequest("/v3/account/", Method.Get);
-            request.AddHeader("ApiKey", _apiKey);
-            request.AddHeader("ApiSecret", _apiSecret);
-            var response = await _client.ExecuteAsync<AccountInfoResponse>(request);
-
-            if (response.Data == null)
+            var request = new HttpRequestMessage
             {
-                throw new Exception("Failed to get account info");
-            }
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"https://www.mercadobitcoin.net{endpoint}"),
+                Headers =
+                {
+                    { "TAPI-ID", _apiKey },
+                    { "TAPI-MAC", signature }
+                }
+            };
 
-            return response.Data;
+            var content = new StringContent(queryString, Encoding.UTF8, "application/x-www-form-urlencoded");
+            request.Content = content;
+
+            using (var response = await _httpClient.SendAsync(request))
+            {
+                response.EnsureSuccessStatusCode();
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return JObject.Parse(responseBody);
+            }
         }
 
-        public string GetCoinName(string coin)
+        public async Task<JObject> GetAccountBalanceAsync()
         {
-            return _coinNames.TryGetValue(coin, out var name) ? name : coin;
+            string queryString = $"tapi_method=get_account_info&tapi_nonce={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+            return await SendRequestAsync("POST", queryString);
+        }
+
+        public async Task<JObject> PlaceBuyOrderAsync(string coinPair, decimal quantity, decimal limitPrice)
+        {
+            string queryString = $"tapi_method=place_buy_order&tapi_nonce={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}&coin_pair={coinPair}&quantity={quantity}&limit_price={limitPrice}";
+            return await SendRequestAsync("POST", queryString);
+        }
+
+        public async Task<JObject> PlaceSellOrderAsync(string coinPair, decimal quantity, decimal limitPrice)
+        {
+            string queryString = $"tapi_method=place_sell_order&tapi_nonce={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}&coin_pair={coinPair}&quantity={quantity}&limit_price={limitPrice}";
+            return await SendRequestAsync("POST", queryString);
         }
     }
 }
