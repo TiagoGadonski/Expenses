@@ -44,10 +44,20 @@ public class CryptoDataService
             RequestUri = new Uri($"https://newsapi.org/v2/everything?q=cryptocurrency&apiKey={_newsApiKey}")
         };
 
+        request.Headers.Add("User-Agent", "Mozilla/5.0");
+
         using (var response = await _httpClient.SendAsync(request))
         {
-            response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // Log the response body to understand the error
+                Console.WriteLine($"Error fetching news: {response.StatusCode}");
+                Console.WriteLine(responseBody);
+            }
+
+            response.EnsureSuccessStatusCode();
             return JObject.Parse(responseBody);
         }
     }

@@ -13,23 +13,30 @@
     </div>
 
     <h2>Account Balance</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Asset</th>
-                <th>Balance</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var balance in Model.AccountBalance["balances"])
-            {
+    @if (Model.AccountBalance?["balances"] != null)
+    {
+        <table>
+            <thead>
                 <tr>
-                    <td>@balance["asset"]?.ToString()</td>
-                    <td>@balance["available"]?.ToString()</td>
+                    <th>Asset</th>
+                    <th>Balance</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var balance in Model.AccountBalance["balances"])
+                {
+                    <tr>
+                        <td>@balance["asset"]?.ToString()</td>
+                        <td>@balance["available"]?.ToString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No account balance information available.</p>
+    }
 
     <div class="row mb-3">
         <div class="col col-md-6 col-xxl d-flex">
@@ -41,12 +48,12 @@
                         </div>
 
                         <div class="col-auto">
-                            <div class="stat" style="">
+                            <div class="stat">
                                 <i class="fa-solid fa-dollar-sign align-middle"></i>
                             </div>
                         </div>
                     </div>
-                    <h4 class="mt-0 mb-1">@string.Format("{0:N2}", Model["totalMarketCap"]) <span class="text-muted">BRL</span></h4>
+                    <h4 class="mt-0 mb-1">@string.Format("{0:N2}", Model.MarketOverview["totalMarketCap"]) <span class="text-muted">BRL</span></h4>
 
                 </div>
             </div>
@@ -65,7 +72,7 @@
                             </div>
                         </div>
                     </div>
-                    <h4 class="mt-0 mb-1">@string.Format("{0:N2}", Model["totalVolume24h"])<span class="text-muted">BRL</span></h4>
+                    <h4 class="mt-0 mb-1">@string.Format("{0:N2}", Model.MarketOverview["totalVolume24h"])<span class="text-muted">BRL</span></h4>
 
                 </div>
             </div>
@@ -92,7 +99,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var cryptocurrency in Model["mostExpensive"])
+                        @foreach (var cryptocurrency in Model.MarketOverview["mostExpensive"])
                         {
                             <tr>
                                 <td>@cryptocurrency["name"]?.ToString()</td>
@@ -126,7 +133,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var cryptocurrency in Model["cheapest"])
+                        @foreach (var cryptocurrency in Model.MarketOverview["cheapest"])
                         {
                             <tr>
                                 <td>@cryptocurrency["name"]?.ToString()</td>
@@ -147,7 +154,7 @@
                 trending_up
             </span>
         </h3>
-        @foreach (var cryptocurrency in Model["topGainers"])
+        @foreach (var cryptocurrency in Model.MarketOverview["topGainers"])
         {
             <div class="col-2 text-success text-center">
                 <div class="custom-card rounded flex-fill align-items-center text-center p-4 py-6">
@@ -174,7 +181,7 @@
                 trending_down
             </span>
         </h3>
-        @foreach (var cryptocurrency in Model["topLosers"])
+        @foreach (var cryptocurrency in Model.MarketOverview["topLosers"])
         {
             <div class="col-2 text-danger text-center">
                 <div class="card rounded flex-fill align-items-center text-center p-4 py-6">

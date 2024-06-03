@@ -9,16 +9,9 @@ public class CryptoFeedbackService
         _dbService = dbService;
     }
 
-    public async Task StoreFeedbackAsync(CryptoPrice prediction, float actualPrice)
+    public async Task StoreFeedbackAsync(CryptoFeedback feedback, float actualPrice)
     {
-        var feedback = new CryptoFeedback
-        {
-            Date = prediction.LastUpdated,
-            PredictedPrice = prediction.Price,
-            ActualPrice = actualPrice,
-            SentimentScore = prediction.SentimentScore
-        };
-
+        feedback.ActualPrice = actualPrice;
         await _dbService.StoreFeedbackAsync(feedback);
     }
 

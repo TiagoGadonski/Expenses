@@ -18,8 +18,6 @@ public class CryptoPredictionService
         var dataView = _mlContext.Data.LoadFromEnumerable(data);
 
         var pipeline = _mlContext.Transforms.Concatenate("Features", nameof(CryptoPrice.DateNumeric), nameof(CryptoPrice.SentimentScore))
-            .Append(_mlContext.Transforms.Conversion.ConvertType(nameof(CryptoPrice.DateNumeric), outputKind: DataKind.Single))
-            .Append(_mlContext.Transforms.Conversion.ConvertType(nameof(CryptoPrice.SentimentScore), outputKind: DataKind.Single))
             .Append(_mlContext.Transforms.CopyColumns("Label", nameof(CryptoPrice.Price)))
             .Append(_mlContext.Regression.Trainers.LbfgsPoissonRegression(labelColumnName: "Label", featureColumnName: "Features"));
 
@@ -42,6 +40,7 @@ public class CryptoPredictionService
 
         var predictionEngine = _mlContext.Model.CreatePredictionEngine<CryptoPrice, CryptoPrediction>(_model);
         var prediction = predictionEngine.Predict(data);
+        Console.WriteLine($"Predicted price for {data.LastUpdated}: {prediction.Price}");
         return prediction.Price;
     }
 

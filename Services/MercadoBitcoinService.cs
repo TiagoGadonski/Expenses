@@ -1,75 +1,106 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
 using System.Text;
 
-namespace Expenses.Services
+public class MercadoBitcoinService
 {
-    public class MercadoBitcoinService
+    private readonly string _apiKey;
+    private readonly string _apiSecret;
+    private readonly HttpClient _httpClient;
+
+    public MercadoBitcoinService(HttpClient httpClient, string apiKey, string apiSecret)
     {
-        private readonly string _apiKey;
-        private readonly string _apiSecret;
-        private readonly HttpClient _httpClient;
+        _apiKey = apiKey;
+        _apiSecret = apiSecret;
+        _httpClient = httpClient;
+    }
 
-        public MercadoBitcoinService(HttpClient httpClient, string apiKey, string apiSecret)
-        {
-            _apiKey = apiKey;
-            _apiSecret = apiSecret;
-            _httpClient = httpClient;
-        }
+    public async Task<JObject> GetAccountBalanceAsync()
+    {
+        string endpoint = "/tapi/v3/account_info";
+        string timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+        string signature = CreateSignature(endpoint, timestamp);
 
-        private string CreateSignature(string queryString)
+        var request = new HttpRequestMessage
         {
-            using (var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(_apiSecret)))
+            Method = HttpMethod.Post,
+            RequestUri = new Uri($"https://www.mercadobitcoin.net{endpoint}"),
+            Headers =
             {
-                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(queryString));
-                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+                { "TAPI-ID", _apiKey },
+                { "TAPI-MAC", signature }
             }
-        }
+        };
 
-        private async Task<JObject> SendRequestAsync(string method, string queryString)
+        var content = new StringContent($"tapi_method=get_account_info&tapi_nonce={timestamp}", Encoding.UTF8, "application/x-www-form-urlencoded");
+        request.Content = content;
+
+        using (var response = await _httpClient.SendAsync(request))
         {
-            string endpoint = "/tapi/v3/";
-            string nonce = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            string signature = CreateSignature(queryString);
+            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return JObject.Parse(responseBody);
+        }
+    }
 
-            var request = new HttpRequestMessage
+    public async Task<JObject> PlaceBuyOrderAsync(string coinPair, decimal quantity, decimal limitPrice)
+    {
+        string endpoint = "/tapi/v3/order";
+        string timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+        string signature = CreateSignature(endpoint, timestamp);
+
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = new Uri($"https://www.mercadobitcoin.net{endpoint}"),
+            Headers =
             {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri($"https://www.mercadobitcoin.net{endpoint}"),
-                Headers =
-                {
-                    { "TAPI-ID", _apiKey },
-                    { "TAPI-MAC", signature }
-                }
-            };
-
-            var content = new StringContent(queryString, Encoding.UTF8, "application/x-www-form-urlencoded");
-            request.Content = content;
-
-            using (var response = await _httpClient.SendAsync(request))
-            {
-                response.EnsureSuccessStatusCode();
-                var responseBody = await response.Content.ReadAsStringAsync();
-                return JObject.Parse(responseBody);
+                { "TAPI-ID", _apiKey },
+                { "TAPI-MAC", signature }
             }
-        }
+        };
 
-        public async Task<JObject> GetAccountBalanceAsync()
-        {
-            string queryString = $"tapi_method=get_account_info&tapi_nonce={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
-            return await SendRequestAsync("POST", queryString);
-        }
+        var content = new StringContent($"tapi_method=place_order&tapi_nonce={timestamp}&coin_pair={coinPair}&quantity={quantity}&limit_price={limitPrice}&order_type=buy", Encoding.UTF8, "application/x-www-form-urlencoded");
+        request.Content = content;
 
-        public async Task<JObject> PlaceBuyOrderAsync(string coinPair, decimal quantity, decimal limitPrice)
+        using (var response = await _httpClient.SendAsync(request))
         {
-            string queryString = $"tapi_method=place_buy_order&tapi_nonce={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}&coin_pair={coinPair}&quantity={quantity}&limit_price={limitPrice}";
-            return await SendRequestAsync("POST", queryString);
+            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return JObject.Parse(responseBody);
         }
+    }
 
-        public async Task<JObject> PlaceSellOrderAsync(string coinPair, decimal quantity, decimal limitPrice)
+    public async Task<JObject> PlaceSellOrderAsync(string coinPair, decimal quantity, decimal limitPrice)
+    {
+        string endpoint = "/tapi/v3/order";
+        string timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+        string signature = CreateSignature(endpoint, timestamp);
+
+        var request = new HttpRequestMessage
         {
-            string queryString = $"tapi_method=place_sell_order&tapi_nonce={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}&coin_pair={coinPair}&quantity={quantity}&limit_price={limitPrice}";
-            return await SendRequestAsync("POST", queryString);
+            Method = HttpMethod.Post,
+            RequestUri = new Uri($"https://www.mercadobitcoin.net{endpoint}"),
+            Headers =
+            {
+                { "TAPI-ID", _apiKey },
+                { "TAPI-MAC", signature }
+            }
+        };
+
+        var content = new StringContent($"tapi_method=place_order&tapi_nonce={timestamp}&coin_pair={coinPair}&quantity={quantity}&limit_price={limitPrice}&order_type=sell", Encoding.UTF8, "application/x-www-form-urlencoded");
+        request.Content = content;
+
+        using (var response = await _httpClient.SendAsync(request))
+        {
+            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            return JObject.Parse(responseBody);
         }
+    }
+
+    private string CreateSignature(string endpoint, string timestamp)
+    {
+        // Implement your signature creation logic here based on Mercado Bitcoin API requirements
+        return "";
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Expenses.Models;
-using Expenses.Services;
 using Microsoft.AspNetCore.Mvc;
 
 public class CryptoController : Controller
@@ -11,8 +10,13 @@ public class CryptoController : Controller
     private readonly SentimentAnalysisService _sentimentAnalysisService;
     private readonly CryptoFeedbackService _cryptoFeedbackService;
 
-    public CryptoController(CoinMarketCapService coinMarketCapService, MercadoBitcoinService mercadoBitcoinService, CryptoDataService cryptoDataService, CryptoPredictionService cryptoPredictionService,
-        SentimentAnalysisService sentimentAnalysisService, CryptoFeedbackService cryptoFeedbackService)
+    public CryptoController(
+        CoinMarketCapService coinMarketCapService,
+        MercadoBitcoinService mercadoBitcoinService,
+        CryptoDataService cryptoDataService,
+        CryptoPredictionService cryptoPredictionService,
+        SentimentAnalysisService sentimentAnalysisService,
+        CryptoFeedbackService cryptoFeedbackService)
     {
         _coinMarketCapService = coinMarketCapService;
         _mercadoBitcoinService = mercadoBitcoinService;
@@ -55,6 +59,7 @@ public class CryptoController : Controller
         // Recolher dados de preços e notícias
         var prices = await _cryptoDataService.GetCryptoPricesAsync();
         var news = await _cryptoDataService.GetCryptoNewsAsync();
+        var accountBalance = await _mercadoBitcoinService.GetAccountBalanceAsync();
 
         // Pré-processar os dados e calcular o sentimento
         var cryptoDataList = prices["data"]
@@ -73,7 +78,7 @@ public class CryptoController : Controller
         var predictions = cryptoDataList
             .Select(data => new
             {
-                LastUpdated = data.LastUpdated,
+                Date = data.LastUpdated,
                 ActualPrice = data.Price,
                 PredictedPrice = _cryptoPredictionService.Predict(data)
             })
@@ -82,12 +87,15 @@ public class CryptoController : Controller
         // Armazenar feedback das previsões
         foreach (var prediction in predictions)
         {
-            await _cryptoFeedbackService.StoreFeedbackAsync(new CryptoPrice
+            var cryptoFeedback = new CryptoFeedback
             {
-                LastUpdated = prediction.LastUpdated,
-                Price = prediction.PredictedPrice,
-                SentimentScore = cryptoDataList.First(c => c.LastUpdated == prediction.LastUpdated).SentimentScore
-            }, prediction.ActualPrice);
+                Date = prediction.Date,
+                PredictedPrice = prediction.PredictedPrice,
+                ActualPrice = prediction.ActualPrice,
+                SentimentScore = cryptoDataList.First(c => c.LastUpdated == prediction.Date).SentimentScore
+            };
+
+            await _cryptoFeedbackService.StoreFeedbackAsync(cryptoFeedback, prediction.ActualPrice);
         }
 
         // Gerar resumo diário e dicas de investimento
@@ -98,7 +106,8 @@ public class CryptoController : Controller
         {
             DailySummary = dailySummary,
             InvestmentTips = investmentTips,
-            News = news["articles"]
+            News = news["articles"],
+            AccountBalance = accountBalance
         };
 
         return View(model);
@@ -108,7 +117,7 @@ public class CryptoController : Controller
     {
         // Lógica de geração de resumo diário
         var latestPrediction = predictions.Last();
-        return $"Predicted price for {latestPrediction.LastUpdated.ToShortDateString()}: ${latestPrediction.PredictedPrice:N2}";
+        return $"Predicted price for {latestPrediction.Date.ToShortDateString()}: ${latestPrediction.PredictedPrice:N2}";
     }
 
     private List<string> GenerateInvestmentTips(List<dynamic> predictions)
@@ -116,7 +125,7 @@ public class CryptoController : Controller
         // Lógica de geração de dicas de investimento
         return predictions
             .Where(p => p.PredictedPrice > p.ActualPrice)
-            .Select(p => $"Consider investing on {p.LastUpdated.ToShortDateString()} with predicted price: ${p.PredictedPrice:N2}")
+            .Select(p => $"Consider investing on {p.Date.ToShortDateString()} with predicted price: ${p.PredictedPrice:N2}")
             .ToList();
     }
 }

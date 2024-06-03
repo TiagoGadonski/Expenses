@@ -113,7 +113,7 @@
                         <td>@item.Category</td>
                         <td>@item.CurrentInstallment</td>
                         <td>@item.Installments</td>
-                        <td class="row gap-2">
+                        <td class="gap-2">
                             @if (!item.IsPaidThisMonth)
                             {
                                 <form asp-action="MarkAsPaid" asp-controller="Expenses" method="post" style="display:inline;">
