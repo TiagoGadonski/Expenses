@@ -1,6 +1,9 @@
 using Expenses.Data;
+using Expenses.Models;
 using Expenses.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,20 +11,24 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configure API keys
+builder.Services.Configure<ApiKeys>(builder.Configuration.GetSection("ApiKeys"));
+
 builder.Services.AddHttpClient<CoinMarketCapService>(client =>
 {
     client.BaseAddress = new Uri("https://pro-api.coinmarketcap.com");
 });
 
-builder.Services.AddSingleton(provider =>
+builder.Services.AddSingleton<CoinMarketCapService>(provider =>
 {
     var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
-    return new CoinMarketCapService(httpClient, "145bcacc-f453-435b-81f4-e4a4f0cf1e8c");
+    var apiKeys = provider.GetRequiredService<IOptions<ApiKeys>>().Value;
+    return new CoinMarketCapService(httpClient, apiKeys.CoinMarketCapApiKey);
 });
 
-builder.Services.AddSingleton(provider =>
+builder.Services.AddSingleton<MercadoBitcoinService>(provider =>
 {
-    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient("MercadoBitcoinService");
     return new MercadoBitcoinService(httpClient, "cb23ede8f8cf0b7b969938f2b90ba9a8a9bb3611ee9fa1990402b79f8d937df8", "6408ead524f515ff46555eed79f6a1ee0196bfbd5a8a57e877498275fec28df4");
 });
 
@@ -30,12 +37,18 @@ builder.Services.AddHttpClient<CryptoDataService>(client =>
     client.BaseAddress = new Uri("https://pro-api.coinmarketcap.com");
 });
 
-builder.Services.AddScoped<CryptoDataService>(); // Change to Scoped
+builder.Services.AddScoped(provider =>
+{
+    var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
+    var dbService = provider.GetRequiredService<DatabaseService>();
+    var apiKeys = provider.GetRequiredService<IOptions<ApiKeys>>().Value;
+    return new CryptoDataService(httpClient, apiKeys.CoinMarketCapApiKey, apiKeys.NewsApiKey, dbService);
+});
 
 builder.Services.AddSingleton<CryptoPredictionService>();
 builder.Services.AddSingleton<SentimentAnalysisService>();
-builder.Services.AddScoped<CryptoFeedbackService>(); // Scoped
-builder.Services.AddScoped<DatabaseService>(); // Scoped for database context
+builder.Services.AddScoped<CryptoFeedbackService>();
+builder.Services.AddScoped<DatabaseService>();
 
 var app = builder.Build();
 
@@ -74,5 +87,6 @@ app.UseEndpoints(endpoints =>
         pattern: "crypto/marketoverview",
         defaults: new { controller = "Crypto", action = "MarketOverview" });
 });
+
 
 app.Run();
