@@ -30,6 +30,9 @@ builder.Services.AddHttpClient<CryptoDataService>(client =>
     client.BaseAddress = new Uri("https://pro-api.coinmarketcap.com");
 });
 
+builder.Services.AddHttpClient<CryptoPriceService>();
+builder.Services.AddHostedService<PriceUpdateService>();
+
 builder.Services.AddScoped(provider =>
 {
     var httpClient = provider.GetRequiredService<IHttpClientFactory>().CreateClient();

@@ -1,0 +1,19 @@
+﻿@model CryptoTransaction
+
+<h2>Add Transaction</h2>
+
+<form asp-action="AddTransaction" method="post">
+    <div class="form-group">
+        <label for="cryptoName">Crypto Name</label>
+        <input type="text" class="form-control" id="cryptoName" name="cryptoName" required>
+    </div>
+    <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <input type="number" step="any" class="form-control" id="quantity" name="quantity" required>
+    </div>
+    <div class="form-group">
+        <label for="purchasePrice">Purchase Price</label>
+        <input type="number" step="any" class="form-control" id="purchasePrice" name="purchasePrice" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>

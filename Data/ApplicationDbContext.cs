@@ -21,6 +21,8 @@ namespace Expenses.Data
         public DbSet<CryptoPrice> CryptoPrices { get; set; }
         public DbSet<CryptoNews> CryptoNews { get; set; }
         public DbSet<CryptoFeedback> CryptoFeedbacks { get; set; }
+        public DbSet<CryptoTransaction> CryptoTransactions { get; set; }
+        public DbSet<CryptoPriceHistory> CryptoPriceHistories { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

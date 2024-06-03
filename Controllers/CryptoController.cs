@@ -1,5 +1,7 @@
-﻿using Expenses.Models;
+﻿using Expenses.Data;
+using Expenses.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 public class CryptoController : Controller
 {
@@ -9,6 +11,8 @@ public class CryptoController : Controller
     private readonly CryptoPredictionService _cryptoPredictionService;
     private readonly SentimentAnalysisService _sentimentAnalysisService;
     private readonly CryptoFeedbackService _cryptoFeedbackService;
+    private readonly CryptoPriceService _cryptoPriceService;
+    private readonly ApplicationDbContext _context;
 
     public CryptoController(
         CoinMarketCapService coinMarketCapService,
@@ -16,7 +20,9 @@ public class CryptoController : Controller
         CryptoDataService cryptoDataService,
         CryptoPredictionService cryptoPredictionService,
         SentimentAnalysisService sentimentAnalysisService,
-        CryptoFeedbackService cryptoFeedbackService)
+        CryptoFeedbackService cryptoFeedbackService,
+        CryptoPriceService cryptoPriceService,
+        ApplicationDbContext context)
     {
         _coinMarketCapService = coinMarketCapService;
         _mercadoBitcoinService = mercadoBitcoinService;
@@ -24,6 +30,54 @@ public class CryptoController : Controller
         _cryptoPredictionService = cryptoPredictionService;
         _sentimentAnalysisService = sentimentAnalysisService;
         _cryptoFeedbackService = cryptoFeedbackService;
+        _cryptoPriceService = cryptoPriceService;
+        _context = context;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var transactions = await _context.CryptoTransactions.ToListAsync();
+        var currentPrices = _context.CryptoPriceHistories
+            .GroupBy(cph => cph.CryptoName)
+            .Select(g => g.OrderByDescending(cph => cph.Date).FirstOrDefault())
+            .ToDictionary(cph => cph.CryptoName, cph => cph.Price);
+
+        var viewModel = transactions.Select(t => new CryptoViewModel
+        {
+            CryptoName = t.CryptoName,
+            Quantity = t.Quantity,
+            PurchasePrice = t.PurchasePrice,
+            CurrentPrice = currentPrices[t.CryptoName],
+            PurchaseDate = t.PurchaseDate,
+            ProfitLoss = (currentPrices[t.CryptoName] * t.Quantity) - (t.PurchasePrice * t.Quantity),
+            ProfitLossPercentage = ((currentPrices[t.CryptoName] - t.PurchasePrice) / t.PurchasePrice) * 100
+        }).ToList();
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddTransaction(string cryptoName, decimal quantity, decimal purchasePrice)
+    {
+        var currentPrice = await _cryptoPriceService.GetCryptoPriceAsync(cryptoName);
+        var transaction = new CryptoTransaction
+        {
+            CryptoName = cryptoName,
+            Quantity = quantity,
+            PurchasePrice = purchasePrice,
+            PurchaseDate = DateTime.UtcNow,
+            CurrentPrice = currentPrice,
+            PriceDate = DateTime.UtcNow
+        };
+
+        _context.CryptoTransactions.Add(transaction);
+        await _context.SaveChangesAsync();
+        return RedirectToAction("Index");
+    }
+
+    public IActionResult AddTransaction()
+    {
+        return View();
     }
 
     public async Task<IActionResult> MarketOverview()

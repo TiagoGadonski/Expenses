@@ -1,0 +1,31 @@
+﻿@model IEnumerable<CryptoViewModel>
+
+<h2>Crypto Transactions</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Purchase Price</th>
+            <th>Current Price</th>
+            <th>Purchase Date</th>
+            <th>Profit/Loss</th>
+            <th>Profit/Loss %</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transaction in Model)
+        {
+            <tr>
+                <td>@transaction.CryptoName</td>
+                <td>@transaction.Quantity</td>
+                <td>@transaction.PurchasePrice</td>
+                <td>@transaction.CurrentPrice</td>
+                <td>@transaction.PurchaseDate</td>
+                <td>@transaction.ProfitLoss</td>
+                <td>@transaction.ProfitLossPercentage %</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a asp-action="AddTransaction" class="btn btn-primary">Add Transaction</a>
