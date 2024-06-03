@@ -33,6 +33,12 @@ namespace Expenses.Models
         {
             get
             {
+                // Considera que o status de pagamento deve ser false no primeiro dia do mês
+                if (DateTime.Now.Day == 1)
+                {
+                    return false;
+                }
+
                 return LastPaymentDate.HasValue &&
                        LastPaymentDate.Value.Month == DateTime.Now.Month &&
                        LastPaymentDate.Value.Year == DateTime.Now.Year;
