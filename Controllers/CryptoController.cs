@@ -37,23 +37,27 @@ public class CryptoController : Controller
     public async Task<IActionResult> Index()
     {
         var transactions = await _context.CryptoTransactions.ToListAsync();
-        var currentPrices = _context.CryptoPriceHistories
-            .GroupBy(cph => cph.CryptoName)
-            .Select(g => g.OrderByDescending(cph => cph.Date).FirstOrDefault())
-            .ToDictionary(cph => cph.CryptoName, cph => cph.Price);
+        var cryptoNames = transactions.Select(t => t.CryptoName).Distinct().ToList();
+        var currentPrices = await _cryptoPriceService.GetCurrentPricesAsync(cryptoNames);
 
         var viewModel = transactions.Select(t => new CryptoViewModel
         {
             CryptoName = t.CryptoName,
             Quantity = t.Quantity,
             PurchasePrice = t.PurchasePrice,
-            CurrentPrice = currentPrices[t.CryptoName],
+            CurrentPrice = currentPrices.ContainsKey(t.CryptoName) ? currentPrices[t.CryptoName] : 0,
             PurchaseDate = t.PurchaseDate,
-            ProfitLoss = (currentPrices[t.CryptoName] * t.Quantity) - (t.PurchasePrice * t.Quantity),
-            ProfitLossPercentage = ((currentPrices[t.CryptoName] - t.PurchasePrice) / t.PurchasePrice) * 100
+            ProfitLoss = currentPrices.ContainsKey(t.CryptoName) ? (currentPrices[t.CryptoName] * t.Quantity) - (t.PurchasePrice * t.Quantity) : 0,
+            ProfitLossPercentage = (t.PurchasePrice != 0 && currentPrices.ContainsKey(t.CryptoName)) ? ((currentPrices[t.CryptoName] - t.PurchasePrice) / t.PurchasePrice) * 100 : 0
         }).ToList();
 
         return View(viewModel);
+    }
+    public async Task<IActionResult> AddTransaction()
+    {
+        var cryptoIds = await _cryptoPriceService.GetCryptoIdsAsync();
+        ViewBag.CryptoIds = cryptoIds;
+        return View();
     }
 
     [HttpPost]
@@ -73,11 +77,6 @@ public class CryptoController : Controller
         _context.CryptoTransactions.Add(transaction);
         await _context.SaveChangesAsync();
         return RedirectToAction("Index");
-    }
-
-    public IActionResult AddTransaction()
-    {
-        return View();
     }
 
     public async Task<IActionResult> MarketOverview()

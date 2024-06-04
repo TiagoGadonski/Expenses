@@ -8,6 +8,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Configurar serviços HTTP e Cache
 builder.Services.AddHttpClient<CoinMarketCapService>(client =>
 {
     client.BaseAddress = new Uri("https://pro-api.coinmarketcap.com");
@@ -31,6 +32,9 @@ builder.Services.AddHttpClient<CryptoDataService>(client =>
 });
 
 builder.Services.AddHttpClient<CryptoPriceService>();
+builder.Services.AddMemoryCache(); // Adicionar serviço de cache
+builder.Services.AddTransient<CryptoPriceService>();
+
 builder.Services.AddHostedService<PriceUpdateService>();
 
 builder.Services.AddScoped(provider =>
