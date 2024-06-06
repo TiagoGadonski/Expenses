@@ -33,8 +33,6 @@ builder.Services.AddHttpClient<CryptoDataService>(client =>
 
 builder.Services.AddHttpClient<CryptoPriceService>();
 builder.Services.AddMemoryCache(); // Adicionar serviço de cache
-builder.Services.AddTransient<CryptoPriceService>();
-
 builder.Services.AddHostedService<PriceUpdateService>();
 
 builder.Services.AddScoped(provider =>
@@ -50,6 +48,9 @@ builder.Services.AddSingleton<CryptoPredictionService>();
 builder.Services.AddSingleton<SentimentAnalysisService>();
 builder.Services.AddScoped<CryptoFeedbackService>();
 builder.Services.AddScoped<DatabaseService>();
+builder.Services.AddHttpClient<CryptoPriceService>();
+
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 var app = builder.Build();
 

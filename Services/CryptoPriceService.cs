@@ -4,75 +4,59 @@ using Newtonsoft.Json.Linq;
 public class CryptoPriceService
 {
     private readonly HttpClient _httpClient;
+    private readonly string _apiKey;
+    private readonly string _apiSecret;
+    private readonly Dictionary<string, string> _cryptoSymbols;
     private readonly IMemoryCache _cache;
-    private readonly Dictionary<string, string> _cryptoIdMap;
 
-    public CryptoPriceService(HttpClient httpClient, IMemoryCache cache)
+    public CryptoPriceService(HttpClient httpClient, IMemoryCache cache, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _cache = cache;
-        _cryptoIdMap = new Dictionary<string, string>
+        _apiKey = configuration["CryptoApi:ApiKey"];
+        _apiSecret = configuration["CryptoApi:ApiSecret"];
+        _cryptoSymbols = new Dictionary<string, string>
         {
-            { "Bitcoin", "bitcoin" },
-            { "Ethereum", "ethereum" }
-            // Adicione mais mapeamentos conforme necessário
+            { "Bitcoin", "BTC" },
+            { "Ethereum", "ETH" },
+            { "Shiba Inu", "SHIB" },
+            { "BitTorrent", "BTT" },
+            { "APENFT", "NFT" },
+            { "Memecoin", "MEME" },
+            { "Bonk", "BONK" },
+            { "Pepe", "PEPE" },
+            { "Dogecoin", "DOGE" },
+            { "Dogewifhat", "DOGEWIFHAT" },
+            { "Gods Unchained", "GODS" }
         };
-    }
-
-    public async Task<Dictionary<string, string>> GetCryptoIdsAsync()
-    {
-        var url = "https://api.coingecko.com/api/v3/coins/list";
-        var response = await _httpClient.GetStringAsync(url);
-        var data = JArray.Parse(response);
-
-        var cryptoIds = new Dictionary<string, string>();
-        foreach (var item in data)
-        {
-            var id = item["id"].Value<string>();
-            var name = item["name"].Value<string>();
-            cryptoIds[name] = id;
-        }
-
-        return cryptoIds;
     }
 
     public async Task<decimal> GetCryptoPriceAsync(string cryptoName)
     {
-        if (!_cryptoIdMap.ContainsKey(cryptoName))
+        if (!_cryptoSymbols.ContainsKey(cryptoName))
         {
             throw new Exception($"Crypto name '{cryptoName}' is not recognized.");
         }
 
-        var cryptoId = _cryptoIdMap[cryptoName];
+        string symbol = _cryptoSymbols[cryptoName];
+        string endpoint = $"https://api.coingecko.com/api/v3/simple/price?ids={symbol}&vs_currencies=usd";
 
-        // Try to get price from cache
-        if (_cache.TryGetValue(cryptoName, out decimal cachedPrice))
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        if (!response.IsSuccessStatusCode)
         {
-            return cachedPrice;
+            throw new HttpRequestException($"Error fetching price for {cryptoName}: {response.StatusCode}");
         }
 
-        var url = $"https://api.coingecko.com/api/v3/simple/price?ids={cryptoId}&vs_currencies=brl";
-        var response = await _httpClient.GetStringAsync(url);
-        var data = JObject.Parse(response);
+        string content = await response.Content.ReadAsStringAsync();
+        JObject json = JObject.Parse(content);
 
-        if (data.ContainsKey(cryptoId) && data[cryptoId]["brl"] != null)
+        if (json[symbol] == null || json[symbol]["usd"] == null)
         {
-            var price = data[cryptoId]["brl"].Value<decimal>();
-
-            // Set cache with expiration time
-            var cacheEntryOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) // Cache for 5 minutes
-            };
-
-            _cache.Set(cryptoName, price, cacheEntryOptions);
-
-            return price;
+            throw new Exception($"Price information for {cryptoName} is not available.");
         }
-        else
-        {
-            throw new Exception($"Could not retrieve price for {cryptoName}");
-        }
+
+        decimal price = json[symbol]["usd"].Value<decimal>();
+        return price;
     }
 
     public async Task<Dictionary<string, decimal>> GetCurrentPricesAsync(List<string> cryptoNames)
@@ -81,22 +65,37 @@ public class CryptoPriceService
 
         foreach (var cryptoName in cryptoNames)
         {
-            if (!_cryptoIdMap.ContainsKey(cryptoName))
+            if (!_cryptoSymbols.ContainsKey(cryptoName))
             {
                 continue; // Ignore criptos não mapeadas
             }
 
-            var cryptoId = _cryptoIdMap[cryptoName];
+            var cryptoId = _cryptoSymbols[cryptoName];
 
             // Try to get price from cache
-            if (!_cache.TryGetValue(cryptoName, out decimal price))
+            try
             {
-                price = await GetCryptoPriceAsync(cryptoName);
-            }
+                if (!_cache.TryGetValue(cryptoName, out decimal price))
+                {
+                    price = await GetCryptoPriceAsync(cryptoName);
+                }
 
-            prices[cryptoName] = price;
+                prices[cryptoName] = price;
+            }
+            catch (Exception ex)
+            {
+                // Log error or handle it accordingly
+                Console.WriteLine($"Error fetching price for {cryptoName}: {ex.Message}");
+                prices[cryptoName] = 0; // You can choose to set a default value or handle it differently
+            }
         }
 
         return prices;
+    }
+
+    public async Task<Dictionary<string, string>> GetCryptoIdsAsync()
+    {
+        // Retorna apenas os símbolos que foram configurados
+        return await Task.FromResult(_cryptoSymbols);
     }
 }
