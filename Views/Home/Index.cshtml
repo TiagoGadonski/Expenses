@@ -88,98 +88,94 @@
         </div>
     </div>
 
-    <div class="card card-custom p-3">
-        <h1>Expenses</h1>
+    <div class="d-flex bg-light gap-1">
+        <div class="flex-fill card" style="width: 75%;">
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Value</th>
-                    <th>Date</th>
-                    <th>Category</th>
-                    <th>Current Installment</th>
-                    <th>Total Installments</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Expenses)
-                {
+            <h1 class="text-center">Expenses</h1>
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@item.Description</td>
-                        <td>@item.Value.ToString("C")</td>
-                        <td>@item.Date.ToShortDateString()</td>
-                        <td>@item.Category</td>
-                        <td>@item.CurrentInstallment</td>
-                        <td>@item.Installments</td>
-                        <td class="gap-2">
-                            @if (!item.IsPaidThisMonth)
-                            {
-                                <form asp-action="MarkAsPaid" asp-controller="Expenses" method="post" style="display:inline;">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    <button type="submit" class="btn btn-success btn-sm align-middle">
-                                        <span class="material-symbols-outlined" style="font-size: 1rem;">
-                                            paid
-                                        </span>
-                                        Pagar
-                                    </button>
-                                </form>
-                            }
-                            <a asp-action="Edit" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-warning btn-sm rounded-circle btn-icon">
-                                <span class="material-symbols-outlined text-white" style="font-size: 1rem;">
-                                    edit_square
-                                </span>
-                            </a>
-                            <a asp-action="Details" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-info btn-sm rounded-circle btn-icon">
-                                <span class="material-symbols-outlined text-white" style="font-size: 1rem;">
-                                    info
-                                </span>
-                            </a>
-                            <a asp-action="Delete" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-danger btn-sm rounded-circle btn-icon">
-                                <span class="material-symbols-outlined text-white" style="font-size: 1rem;">
-                                    delete
-                                </span>
-                            </a>
-                        </td>
+                        <th>Description</th>
+                        <th>Value</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Current Installment</th>
+                        <th>Total Installments</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Expenses)
+                    {
+                        <tr>
+                            <td>@item.Description</td>
+                            <td>@item.Value.ToString("C")</td>
+                            <td>@item.Date.ToShortDateString()</td>
+                            <td>@item.Category</td>
+                            <td>@item.CurrentInstallment</td>
+                            <td>@item.Installments</td>
+                            <td class="gap-2 d-flex flex-wrap">
+                                @if (!item.IsPaidThisMonth)
+                                {
+                                    <form asp-action="MarkAsPaid" asp-controller="Expenses" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-success btn-sm align-middle">
+                                            <span class="material-symbols-outlined" style="font-size: 1rem;">paid</span>
+                                            Pagar
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-action="Edit" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-warning btn-sm rounded-circle btn-icon">
+                                    <span class="material-symbols-outlined text-white" style="font-size: 1rem;">edit_square</span>
+                                </a>
+                                <a asp-action="Details" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-info btn-sm rounded-circle btn-icon">
+                                    <span class="material-symbols-outlined text-white" style="font-size: 1rem;">info</span>
+                                </a>
+                                <a asp-action="Delete" asp-controller="Expenses" asp-route-id="@item.Id" class="btn btn-danger btn-sm rounded-circle btn-icon">
+                                    <span class="material-symbols-outlined text-white" style="font-size: 1rem;">delete</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="flex-fill card p-3" style="width: 25%;">
 
-        <h1>Wishlist Items</h1>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Category</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.WishlistItems)
-                {
+            <h3 class="text-center">Wishlist Items</h3>
+            <table class="table" >
+                <thead style="font-size: 1rem;">
                     <tr>
-                        <td>@item.Name</td>
-                        <td>@item.Price?.ToString("C")</td>
-                        <td>@item.Category</td>
-                        <td>
-                            @if (!item.IsPurchased)
-                            {
-                                <form asp-action="MarkAsPurchased" asp-controller="WishlistItems" method="post" style="display:inline;">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    <button type="submit" class="btn btn-success">Purchased</button>
-                                </form>
-                            }
-                            <a asp-action="Edit" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                            <a asp-action="Details" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                            <a asp-action="Delete" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
-                        </td>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody style="font-size: 1rem;">
+                    @foreach (var item in Model.WishlistItems)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Price?.ToString("C")</td>
+                            <td>
+                                @if (!item.IsPurchased)
+                                {
+                                    <form asp-action="MarkAsPurchased" asp-controller="WishlistItems" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-success">
+                                            <span class="material-symbols-outlined" style="font-size: 1rem;">paid</span>
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-action="Edit" asp-controller="WishlistItems" asp-route-id="@item.Id" class="btn btn-warning">
+                                    <span class="material-symbols-outlined text-white" style="font-size: 1rem;">edit_square</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
+
 </div>

@@ -162,6 +162,19 @@
                                 <i class="fas fa-bullseye me-2"></i> Expense Goal
                             </a>
                         </li>
+
+                        <li class="nav-item dropdown">
+                            <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Crypto
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Crypto" asp-action="AddTransaction">AddTransaction</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Crypto" asp-action="Index">Index</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Crypto" asp-action="MarketOverview">MarketOverview</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Crypto" asp-action="MarketSummary">MarketSummary</a></li>
+                            </ul>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link d-flex align-items-center" asp-area="" asp-controller="Crypto" asp-action="MarketOverview">
                                 <i class="fas fa-coins me-2"></i> Crypto
